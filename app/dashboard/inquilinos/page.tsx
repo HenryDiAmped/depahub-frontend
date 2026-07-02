@@ -84,7 +84,7 @@ export default function InquilinosPage() {
         nombreCompleto: formData.nombreCompleto,
         dni: formData.dni,
         telefono: formData.telefono,
-        email: formData.email,
+        email: formData.email || "", // Email opcional
         fechaNacimiento: formData.fechaNacimiento,
         estado: formData.estado,
         inmueble: formData.inmuebleId ? { id: Number(formData.inmuebleId) } : undefined,
@@ -125,7 +125,7 @@ export default function InquilinosPage() {
       nombreCompleto: inquilino.nombreCompleto,
       dni: inquilino.dni,
       telefono: inquilino.telefono,
-      email: inquilino.email,
+      email: inquilino.email || "",
       fechaNacimiento: inquilino.fechaNacimiento,
       estado: inquilino.estado,
       inmuebleId: inquilino.inmueble?.id?.toString() || "",
@@ -138,13 +138,15 @@ export default function InquilinosPage() {
       return;
 
     try {
+      // Retirar inquilino y desasociar del inmueble
       await inquilinosApi.update(inquilino.id!, {
         ...inquilino,
         estado: "RETIRADO",
+        inmueble: undefined, // Desasociar del inmueble
       });
       toast({
         title: "Inquilino retirado",
-        description: "El inquilino se marcó como retirado",
+        description: "El inquilino se marcó como retirado y se liberó el inmueble",
       });
       fetchData();
     } catch (error) {
@@ -230,7 +232,7 @@ export default function InquilinosPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Email (opcional)</Label>
                   <Input
                     id="email"
                     type="email"
@@ -238,7 +240,7 @@ export default function InquilinosPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    required
+                    placeholder="correo@ejemplo.com"
                   />
                 </div>
                 <div>
@@ -328,9 +330,14 @@ export default function InquilinosPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-1 text-sm">
-                  <p>📧 {inquilino.email}</p>
+                  {inquilino.email && <p>📧 {inquilino.email}</p>}
                   <p>📞 {inquilino.telefono}</p>
                   <p>🎂 {inquilino.fechaNacimiento}</p>
+                  {inquilino.inmueble?.id && (
+                    <p className="font-medium text-primary">
+                      🏠 {inmuebles.find(i => i.id === inquilino.inmueble?.id)?.nombre || `Inmueble #${inquilino.inmueble.id}`}
+                    </p>
+                  )}
                 </div>
                 <div className="mt-4 flex gap-2">
                   <Button

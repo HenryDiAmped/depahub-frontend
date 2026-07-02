@@ -41,7 +41,7 @@ export interface Inquilino {
   nombreCompleto: string;
   dni: string;
   telefono: string;
-  email: string;
+  email?: string; // Email es opcional
   fechaNacimiento: string;
   estado: EstadoInquilino;
   inmueble?: { id: number };

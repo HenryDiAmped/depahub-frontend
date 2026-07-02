@@ -32,7 +32,7 @@ export function getErrorMessage(
       } else if (errorMessage.toLowerCase().includes("inquilino")) {
         return {
           title: `No se puede eliminar ${entityName}`,
-          description: "Este registro tiene inquilinos asociados. Retira primero a los inquilinos.",
+          description: "Este inmueble tiene inquilinos asociados. Los inquilinos deben retirarse primero antes de eliminar el inmueble.",
         };
       } else if (errorMessage.toLowerCase().includes("contrato")) {
         return {

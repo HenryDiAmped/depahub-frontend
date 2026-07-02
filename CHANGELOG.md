@@ -1,5 +1,52 @@
 # Changelog - DepHub Frontend
 
+## [1.0.3] - 2026-07-02
+
+### ✨ Mejoras en Módulo de Inquilinos
+
+#### 1. Visualización del inmueble ocupado
+- **Mejora**: Ahora se muestra el departamento/inmueble que ocupa cada inquilino en su tarjeta.
+- **Visualización**: Icono 🏠 con el nombre del inmueble en color primario.
+- **Beneficio**: El administrador puede ver rápidamente qué inmueble ocupa cada inquilino.
+
+#### 2. Email opcional
+- **Mejora**: El campo email ahora es opcional al crear o editar inquilinos.
+- **Cambios**:
+  - Removido el `required` del campo email en el formulario
+  - Actualizada la interfaz `Inquilino` para que `email` sea opcional
+  - Label actualizado a "Email (opcional)"
+- **Beneficio**: Mayor flexibilidad al registrar inquilinos que no tienen email.
+
+#### 3. Desasociación automática al retirar inquilino
+- **Mejora**: Cuando un inquilino se retira, automáticamente se desasocia del inmueble.
+- **Comportamiento**:
+  - Estado del inquilino cambia a "RETIRADO"
+  - El inquilino se desvincula del inmueble (`inmueble: undefined`)
+  - El inmueble queda libre para asignar a otro inquilino
+- **Beneficio**: El flujo es más natural y evita inconsistencias en los datos.
+
+#### 4. Mensaje de error mejorado para inmuebles
+- **Mejora**: El mensaje al intentar eliminar un inmueble con inquilinos ahora es más específico.
+- **Mensaje anterior**: "Este registro tiene inquilinos asociados. Retira primero a los inquilinos."
+- **Mensaje nuevo**: "Este inmueble tiene inquilinos asociados. Los inquilinos deben retirarse primero antes de eliminar el inmueble."
+- **Beneficio**: Más claridad sobre qué acción tomar.
+
+### 🔧 Reglas de Negocio Implementadas
+
+1. ✅ Se permite borrar inmueble solo si:
+   - No tiene inquilino asociado, O
+   - El inquilino que lo ocupaba ya se retiró (estado: RETIRADO)
+
+2. ✅ No se permite borrar inmueble si:
+   - Tiene un inquilino activo asociado
+
+### 📝 Archivos modificados
+- `app/dashboard/inquilinos/page.tsx` - Todas las mejoras del módulo
+- `lib/types.ts` - Email opcional en interfaz Inquilino
+- `lib/error-handler.ts` - Mensaje mejorado para inmuebles con inquilinos
+
+---
+
 ## [1.0.2] - 2026-07-02
 
 ### ✨ Mejoras

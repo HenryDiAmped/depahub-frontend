@@ -2,11 +2,17 @@
 
 Sistema de Gestión de Alquileres - Aplicación Frontend desarrollada con Next.js 16, TypeScript y shadcn/ui.
 
-## 🔥 Última Actualización (v1.0.2)
+## 🔥 Última Actualización (v1.0.3)
 
-✨ **Nuevo**: Mensajes de error descriptivos y contextuales - Ahora el usuario sabe exactamente por qué falló una operación y qué hacer para resolverlo.
+### Mejoras en Inquilinos
+✨ **Nuevo**: Se muestra el departamento que ocupa cada inquilino en su tarjeta  
+✨ **Nuevo**: Email es opcional al crear/editar inquilinos  
+✨ **Nuevo**: Al retirar inquilino, se desasocia automáticamente del inmueble  
+✅ **Mejorado**: Mensaje de error más claro al intentar eliminar inmueble con inquilinos  
 
-✅ **Corregido**: Error al eliminar propiedades - Las operaciones DELETE funcionan correctamente.
+### Versiones anteriores
+✨ **v1.0.2**: Mensajes de error descriptivos y contextuales  
+✅ **v1.0.1**: Operaciones DELETE funcionan correctamente  
 
 Ver [CHANGELOG.md](CHANGELOG.md) para más detalles y [EJEMPLOS-ERRORES.md](EJEMPLOS-ERRORES.md) para ver todos los mensajes de error.
 
