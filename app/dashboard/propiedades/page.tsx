@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Building2, Edit, Trash2, Eye } from "lucide-react";
-import { propiedadesApi, inmueblesApi } from "@/lib/api";
+import { propiedadesApi } from "@/lib/api";
 import type { Propiedad } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { errorHandlers } from "@/lib/error-handler";
@@ -46,8 +46,25 @@ export default function PropiedadesPage() {
   });
 
   useEffect(() => {
+    const fetchPropiedades = async () => {
+      if (!admin?.id) return;
+
+      try {
+        const data = await propiedadesApi.getAll(admin.id);
+        setPropiedades(data);
+      } catch {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "No se pudieron cargar las propiedades",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchPropiedades();
-  }, [admin]);
+  }, [admin?.id]);
 
   const fetchPropiedades = async () => {
     if (!admin?.id) return;
@@ -55,18 +72,16 @@ export default function PropiedadesPage() {
     try {
       const data = await propiedadesApi.getAll(admin.id);
       setPropiedades(data);
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         title: "Error",
         description: "No se pudieron cargar las propiedades",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!admin?.id) return;
 
@@ -96,7 +111,7 @@ export default function PropiedadesPage() {
       setOpen(false);
       resetForm();
       fetchPropiedades();
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         title: "Error",
@@ -127,7 +142,7 @@ export default function PropiedadesPage() {
       });
       fetchPropiedades();
     } catch (error) {
-      const { title, description } = errorHandlers.delete(error, "la propiedad");
+      const { title, description } = errorHandlers.delete(error, "la propiedad", "propiedad");
       toast({
         variant: "destructive",
         title,

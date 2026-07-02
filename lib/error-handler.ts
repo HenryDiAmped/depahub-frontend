@@ -13,7 +13,8 @@ export interface ErrorDetails {
 export function getErrorMessage(
   error: unknown,
   context: 'delete' | 'create' | 'update' | 'fetch' = 'fetch',
-  entityName: string = 'registro'
+  entityName: string = 'registro',
+  entityType?: string // Nuevo parámetro para identificar el tipo de entidad
 ): ErrorDetails {
   const errorMessage = error instanceof Error ? error.message : "Error desconocido";
   
@@ -23,13 +24,28 @@ export function getErrorMessage(
       errorMessage.toLowerCase().includes("referencia")) {
     
     if (context === 'delete') {
-      // Detectar tipo de relación
-      if (errorMessage.toLowerCase().includes("inmueble")) {
+      // Mensajes específicos según el tipo de entidad
+      if (entityType === 'propiedad') {
         return {
           title: `No se puede eliminar ${entityName}`,
-          description: "Este registro tiene inmuebles asociados. Elimina primero todos los inmuebles.",
+          description: "Esta propiedad tiene inmuebles asociados. Elimina primero todos los inmuebles antes de eliminar la propiedad.",
+        };
+      } else if (entityType === 'inmueble') {
+        return {
+          title: `No se puede eliminar ${entityName}`,
+          description: "Este inmueble tiene inquilinos asociados. Los inquilinos deben retirarse primero antes de eliminar el inmueble.",
+        };
+      }
+      
+      // Detectar por palabras clave en el mensaje de error (fallback)
+      if (errorMessage.toLowerCase().includes("inmueble")) {
+        // Si el mensaje dice "inmueble" es porque una propiedad tiene inmuebles
+        return {
+          title: `No se puede eliminar ${entityName}`,
+          description: "Esta propiedad tiene inmuebles asociados. Elimina primero todos los inmuebles.",
         };
       } else if (errorMessage.toLowerCase().includes("inquilino")) {
+        // Si el mensaje dice "inquilino" es porque un inmueble tiene inquilinos
         return {
           title: `No se puede eliminar ${entityName}`,
           description: "Este inmueble tiene inquilinos asociados. Los inquilinos deben retirarse primero antes de eliminar el inmueble.",
@@ -137,15 +153,15 @@ export function getErrorMessage(
  * Variantes específicas para cada tipo de operación
  */
 export const errorHandlers = {
-  delete: (error: unknown, entityName: string = 'el registro') => 
-    getErrorMessage(error, 'delete', entityName),
+  delete: (error: unknown, entityName: string = 'el registro', entityType?: string) => 
+    getErrorMessage(error, 'delete', entityName, entityType),
   
-  create: (error: unknown, entityName: string = 'el registro') => 
-    getErrorMessage(error, 'create', entityName),
+  create: (error: unknown, entityName: string = 'el registro', entityType?: string) => 
+    getErrorMessage(error, 'create', entityName, entityType),
   
-  update: (error: unknown, entityName: string = 'el registro') => 
-    getErrorMessage(error, 'update', entityName),
+  update: (error: unknown, entityName: string = 'el registro', entityType?: string) => 
+    getErrorMessage(error, 'update', entityName, entityType),
   
-  fetch: (error: unknown, entityName: string = 'los datos') => 
-    getErrorMessage(error, 'fetch', entityName),
+  fetch: (error: unknown, entityName: string = 'los datos', entityType?: string) => 
+    getErrorMessage(error, 'fetch', entityName, entityType),
 };

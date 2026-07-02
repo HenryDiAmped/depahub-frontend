@@ -31,8 +31,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Plus, Home, Edit, Trash2 } from "lucide-react";
-import { propiedadesApi, inmueblesApi } from "@/lib/api";
-import type { Propiedad, Inmueble, EstadoInmueble } from "@/lib/types";
+import { propiedadesApi, inmueblesApi, inquilinosApi } from "@/lib/api";
+import type { Propiedad, Inmueble, EstadoInmueble, Inquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { errorHandlers } from "@/lib/error-handler";
 
@@ -43,6 +43,7 @@ export default function PropiedadDetallePage() {
 
   const [propiedad, setPropiedad] = useState<Propiedad | null>(null);
   const [inmuebles, setInmuebles] = useState<Inmueble[]>([]);
+  const [inquilinos, setInquilinos] = useState<Inquilino[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editingInmueble, setEditingInmueble] = useState<Inmueble | null>(null);
@@ -60,12 +61,14 @@ export default function PropiedadDetallePage() {
 
   const fetchData = async () => {
     try {
-      const [propiedadData, inmueblesData] = await Promise.all([
+      const [propiedadData, inmueblesData, inquilinosData] = await Promise.all([
         propiedadesApi.getById(propiedadId),
         inmueblesApi.getAll(propiedadId),
+        inquilinosApi.getAll(),
       ]);
       setPropiedad(propiedadData);
       setInmuebles(inmueblesData);
+      setInquilinos(inquilinosData);
     } catch (error) {
       toast({
         variant: "destructive",
@@ -142,7 +145,7 @@ export default function PropiedadDetallePage() {
       });
       fetchData();
     } catch (error) {
-      const { title, description } = errorHandlers.delete(error, "el inmueble");
+      const { title, description } = errorHandlers.delete(error, "el inmueble", "inmueble");
       toast({
         variant: "destructive",
         title,
@@ -363,6 +366,26 @@ export default function PropiedadDetallePage() {
                         {inmueble.descripcion}
                       </p>
                     )}
+                    {/* Mostrar inquilino que ocupa el inmueble */}
+                    {(() => {
+                      const inquilino = inquilinos.find(
+                        (inq) => inq.inmueble?.id === inmueble.id && inq.estado === "ACTIVO"
+                      );
+                      return inquilino ? (
+                        <div className="mt-2 p-2 bg-muted rounded-md">
+                          <p className="text-sm font-medium">👤 Ocupado por:</p>
+                          <p className="text-sm text-primary font-semibold">
+                            {inquilino.nombreCompleto}
+                          </p>
+                        </div>
+                      ) : inmueble.estado === "OCUPADO" ? (
+                        <div className="mt-2 p-2 bg-muted rounded-md">
+                          <p className="text-sm text-muted-foreground">
+                            👤 Inmueble ocupado
+                          </p>
+                        </div>
+                      ) : null;
+                    })()}
                     <div className="flex gap-2 pt-2">
                       <Button
                         variant="outline"

@@ -241,6 +241,7 @@ export default function InquilinosPage() {
                       setFormData({ ...formData, email: e.target.value })
                     }
                     placeholder="correo@ejemplo.com"
+                    required
                   />
                 </div>
                 <div>

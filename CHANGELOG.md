@@ -1,5 +1,47 @@
 # Changelog - DepHub Frontend
 
+## [1.0.4] - 2026-07-02
+
+### ✨ Mejoras en Mensajes de Error y Visualización de Datos
+
+#### 1. Mensajes de error diferenciados por entidad
+- **Mejora**: Los mensajes de error al eliminar ahora son específicos para cada tipo de entidad.
+- **Implementación**:
+  - Nuevo parámetro `entityType` en el error handler
+  - Mensajes distintos para propiedades vs inmuebles
+- **Resultados**:
+  - **Propiedad con inmuebles**: "Esta propiedad tiene inmuebles asociados. Elimina primero todos los inmuebles antes de eliminar la propiedad."
+  - **Inmueble con inquilinos**: "Este inmueble tiene inquilinos asociados. Los inquilinos deben retirarse primero antes de eliminar el inmueble."
+- **Beneficio**: Mayor claridad y precisión en los mensajes de error.
+
+#### 2. Visualización de inquilino en tarjeta de inmueble
+- **Mejora**: Ahora se muestra qué inquilino ocupa cada inmueble en la vista de inmuebles.
+- **Visualización**:
+  - Si hay inquilino activo: Muestra nombre del inquilino en recuadro destacado
+  - Si está ocupado pero no se encuentra inquilino: Muestra "Inmueble ocupado"
+  - Si está disponible: No muestra nada
+- **Diseño**:
+  ```
+  👤 Ocupado por:
+  Juan Pérez [en color primario]
+  ```
+- **Beneficio**: El administrador ve inmediatamente quién ocupa cada inmueble.
+
+#### 3. Estado OCUPADO automático (Backend)
+- **Nota**: El backend debe actualizar automáticamente el estado del inmueble a OCUPADO cuando se asigna un inquilino.
+- **Frontend**: Recarga los datos después de crear/actualizar inquilinos para reflejar el cambio de estado.
+- **Comportamiento esperado**:
+  - Inquilino asignado a inmueble → Inmueble estado: OCUPADO
+  - Inquilino retirado → Inmueble estado: DISPONIBLE
+
+### 📝 Archivos modificados
+- `lib/error-handler.ts` - Nuevo parámetro `entityType` para mensajes específicos
+- `app/dashboard/propiedades/page.tsx` - Usa entityType "propiedad"
+- `app/dashboard/propiedades/[id]/page.tsx` - Usa entityType "inmueble" y muestra inquilino
+- `app/dashboard/inquilinos/page.tsx` - Recarga datos después de actualizar
+
+---
+
 ## [1.0.3] - 2026-07-02
 
 ### ✨ Mejoras en Módulo de Inquilinos
