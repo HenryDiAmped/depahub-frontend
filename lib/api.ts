@@ -31,11 +31,50 @@ async function fetchApi<T>(
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `Error: ${response.status}`);
+    // Intentar obtener el mensaje de error del backend
+    let errorMessage = `Error: ${response.status}`;
+    
+    try {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } else {
+        const textError = await response.text();
+        if (textError) {
+          errorMessage = textError;
+        }
+      }
+    } catch (e) {
+      // Si falla al parsear el error, usar el mensaje por defecto
+    }
+    
+    throw new Error(errorMessage);
   }
 
-  return response.json();
+  // Si es un DELETE exitoso o respuesta vacía, retornar objeto vacío
+  if (response.status === 204 || response.headers.get('content-length') === '0') {
+    return {} as T;
+  }
+
+  // Verificar si la respuesta tiene contenido
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return response.json();
+  }
+
+  // Si no es JSON, intentar obtener como texto y retornar objeto vacío
+  const text = await response.text();
+  if (!text) {
+    return {} as T;
+  }
+
+  // Intentar parsear como JSON, si falla retornar objeto vacío
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {} as T;
+  }
 }
 
 // ============================================

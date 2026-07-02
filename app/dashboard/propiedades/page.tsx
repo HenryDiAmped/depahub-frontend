@@ -27,6 +27,7 @@ import { Plus, Building2, Edit, Trash2, Eye } from "lucide-react";
 import { propiedadesApi, inmueblesApi } from "@/lib/api";
 import type { Propiedad } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
+import { errorHandlers } from "@/lib/error-handler";
 
 export default function PropiedadesPage() {
   const { admin } = useAuth();
@@ -126,10 +127,11 @@ export default function PropiedadesPage() {
       });
       fetchPropiedades();
     } catch (error) {
+      const { title, description } = errorHandlers.delete(error, "la propiedad");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudo eliminar la propiedad",
+        title,
+        description,
       });
     }
   };

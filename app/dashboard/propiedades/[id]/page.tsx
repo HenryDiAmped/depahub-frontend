@@ -34,6 +34,7 @@ import { ArrowLeft, Plus, Home, Edit, Trash2 } from "lucide-react";
 import { propiedadesApi, inmueblesApi } from "@/lib/api";
 import type { Propiedad, Inmueble, EstadoInmueble } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
+import { errorHandlers } from "@/lib/error-handler";
 
 export default function PropiedadDetallePage() {
   const params = useParams();
@@ -141,10 +142,11 @@ export default function PropiedadDetallePage() {
       });
       fetchData();
     } catch (error) {
+      const { title, description } = errorHandlers.delete(error, "el inmueble");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudo eliminar el inmueble",
+        title,
+        description,
       });
     }
   };

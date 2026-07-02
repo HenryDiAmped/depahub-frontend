@@ -2,6 +2,14 @@
 
 Sistema de Gestión de Alquileres - Aplicación Frontend desarrollada con Next.js 16, TypeScript y shadcn/ui.
 
+## 🔥 Última Actualización (v1.0.2)
+
+✨ **Nuevo**: Mensajes de error descriptivos y contextuales - Ahora el usuario sabe exactamente por qué falló una operación y qué hacer para resolverlo.
+
+✅ **Corregido**: Error al eliminar propiedades - Las operaciones DELETE funcionan correctamente.
+
+Ver [CHANGELOG.md](CHANGELOG.md) para más detalles y [EJEMPLOS-ERRORES.md](EJEMPLOS-ERRORES.md) para ver todos los mensajes de error.
+
 ## 🚀 Tecnologías
 
 - **Next.js 16** - Framework React
