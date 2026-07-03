@@ -29,7 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, BarChart3, TrendingUp, TrendingDown } from "lucide-react";
-import { balancesApi, ingresosApi, egresosApi } from "@/lib/api";
+import { balancesApi, ingresosApi, egresosApi, administradoresApi } from "@/lib/api";
 import type { BalanceMensual, Ingreso, Egreso } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 
@@ -138,7 +138,7 @@ export default function BalancesPage() {
 
   const handleCreateIngreso = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedBalance?.id) return;
+    if (!selectedBalance?.id || !admin?.id) return;
 
     try {
       const ingresoData: Ingreso = {
@@ -156,10 +156,20 @@ export default function BalancesPage() {
       
       // Actualizar el balance con el nuevo total de ingresos
       const utilidad = totalIngresos - selectedBalance.totalEgresos;
-      await balancesApi.update(selectedBalance.id, {
+      const balanceActualizado = await balancesApi.update(selectedBalance.id, {
         ...selectedBalance,
         totalIngresos,
         utilidad,
+      });
+
+      // Recalcular la utilidad total del administrador
+      const todosLosBalances = await balancesApi.getAll(admin.id);
+      const utilidadTotal = todosLosBalances.reduce((sum, bal) => sum + (bal.utilidad || 0), 0);
+      
+      // Actualizar la utilidad total del administrador
+      await administradoresApi.update(admin.id, {
+        ...admin,
+        utilidadTotal,
       });
 
       toast({
@@ -169,8 +179,13 @@ export default function BalancesPage() {
 
       setOpenIngreso(false);
       setIngresoForm({ importe: "", concepto: "", fecha: "" });
-      fetchBalances();
-      fetchDetalleBalance(selectedBalance.id);
+      
+      // Actualizar el balance seleccionado para reflejar los cambios en la vista
+      setSelectedBalance(balanceActualizado);
+      
+      // Refrescar la lista de balances y el detalle
+      await fetchBalances();
+      await fetchDetalleBalance(selectedBalance.id);
     } catch (error) {
       toast({
         variant: "destructive",
@@ -182,7 +197,7 @@ export default function BalancesPage() {
 
   const handleCreateEgreso = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedBalance?.id) return;
+    if (!selectedBalance?.id || !admin?.id) return;
 
     try {
       const egresoData: Egreso = {
@@ -200,10 +215,20 @@ export default function BalancesPage() {
       
       // Actualizar el balance con el nuevo total de egresos
       const utilidad = selectedBalance.totalIngresos - totalEgresos;
-      await balancesApi.update(selectedBalance.id, {
+      const balanceActualizado = await balancesApi.update(selectedBalance.id, {
         ...selectedBalance,
         totalEgresos,
         utilidad,
+      });
+
+      // Recalcular la utilidad total del administrador
+      const todosLosBalances = await balancesApi.getAll(admin.id);
+      const utilidadTotal = todosLosBalances.reduce((sum, bal) => sum + (bal.utilidad || 0), 0);
+      
+      // Actualizar la utilidad total del administrador
+      await administradoresApi.update(admin.id, {
+        ...admin,
+        utilidadTotal,
       });
 
       toast({
@@ -213,8 +238,13 @@ export default function BalancesPage() {
 
       setOpenEgreso(false);
       setEgresoForm({ importe: "", concepto: "", fecha: "" });
-      fetchBalances();
-      fetchDetalleBalance(selectedBalance.id);
+      
+      // Actualizar el balance seleccionado para reflejar los cambios en la vista
+      setSelectedBalance(balanceActualizado);
+      
+      // Refrescar la lista de balances y el detalle
+      await fetchBalances();
+      await fetchDetalleBalance(selectedBalance.id);
     } catch (error) {
       toast({
         variant: "destructive",

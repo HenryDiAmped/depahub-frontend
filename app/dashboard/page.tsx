@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Building2, Home, Users, FileText } from "lucide-react";
-import { propiedadesApi, inmueblesApi, inquilinosApi, contratosApi } from "@/lib/api";
+import { propiedadesApi, inmueblesApi, inquilinosApi, contratosApi, balancesApi } from "@/lib/api";
 
 export default function DashboardPage() {
   const { admin } = useAuth();
@@ -20,6 +20,7 @@ export default function DashboardPage() {
     inquilinos: 0,
     contratos: 0,
   });
+  const [utilidadTotal, setUtilidadTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -27,12 +28,13 @@ export default function DashboardPage() {
       if (!admin?.id) return;
 
       try {
-        const [propiedades, inmuebles, inquilinos, contratos] =
+        const [propiedades, inmuebles, inquilinos, contratos, balances] =
           await Promise.all([
             propiedadesApi.getAll(admin.id),
             inmueblesApi.getAll(),
             inquilinosApi.getAll(),
             contratosApi.getAll(admin.id),
+            balancesApi.getAll(admin.id),
           ]);
 
         setStats({
@@ -41,6 +43,10 @@ export default function DashboardPage() {
           inquilinos: inquilinos.filter((i) => i.estado === "ACTIVO").length,
           contratos: contratos.filter((c) => c.estado === "ACTIVO").length,
         });
+
+        // Calcular la utilidad total sumando todas las utilidades mensuales
+        const utilidadCalculada = balances.reduce((sum, balance) => sum + (balance.utilidad || 0), 0);
+        setUtilidadTotal(utilidadCalculada);
       } catch (error) {
         console.error("Error cargando estadísticas:", error);
       } finally {
@@ -122,7 +128,7 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold">
-            S/. {admin?.utilidadTotal.toFixed(2)}
+            S/. {utilidadTotal.toFixed(2)}
           </div>
         </CardContent>
       </Card>

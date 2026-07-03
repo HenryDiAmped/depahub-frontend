@@ -1,5 +1,110 @@
 # Changelog - DepHub Frontend
 
+## [1.0.7] - 2026-07-02
+
+### ✨ Actualización Automática de Vista y Utilidad Total
+
+#### 1. Actualización automática de la vista en Balances
+- **Mejora**: Al registrar un ingreso o egreso, la vista se actualiza automáticamente sin necesidad de refrescar manualmente.
+- **Problema resuelto**: Anteriormente, después de registrar un movimiento, los totales se actualizaban en la BD pero la vista mostraba valores antiguos hasta refrescar manualmente.
+- **Implementación**:
+  - El balance actualizado se guarda en el estado `selectedBalance`
+  - Los totales (totalIngresos, totalEgresos, utilidad) se actualizan instantáneamente en pantalla
+  - El usuario ve los cambios inmediatamente sin ninguna acción adicional
+- **Beneficio**: Experiencia de usuario fluida y sin interrupciones.
+
+#### 2. Utilidad Total calculada desde Balances Mensuales
+- **Mejora**: La utilidad total del Dashboard ahora se calcula sumando todas las utilidades de los balances mensuales.
+- **Problema resuelto**: La utilidad total no se actualizaba cuando se registraban ingresos/egresos.
+- **Implementación**:
+  - Dashboard obtiene todos los balances mensuales del administrador
+  - Calcula: `utilidadTotal = Σ (utilidad de cada balance mensual)`
+  - Muestra el valor calculado en tiempo real
+  - Al registrar ingreso/egreso, se actualiza la utilidad total del administrador en BD
+- **Fórmula**: `utilidadTotal = balance1.utilidad + balance2.utilidad + ... + balanceN.utilidad`
+- **Beneficio**: El administrador ve su utilidad total real acumulada de todos los períodos.
+
+#### 3. Actualización de utilidad total del administrador
+- **Mejora**: Al registrar cada ingreso o egreso, se recalcula y actualiza la utilidad total del administrador en la BD.
+- **Implementación**:
+  - Después de actualizar el balance mensual
+  - Se obtienen todos los balances del administrador
+  - Se calcula la suma de todas las utilidades
+  - Se actualiza el campo `utilidadTotal` del administrador
+- **Beneficio**: Consistencia entre el Dashboard y los datos almacenados.
+
+### 🔄 Flujo Completo Actualizado
+
+**Registrar un Ingreso:**
+```
+1. Usuario registra ingreso de S/. 500.00
+2. Sistema guarda ingreso en BD
+3. Sistema recalcula totalIngresos del balance
+4. Sistema recalcula utilidad del balance
+5. Sistema actualiza balance en BD
+6. Sistema actualiza selectedBalance en estado ✨ (vista se actualiza)
+7. Sistema recalcula utilidadTotal del administrador
+8. Sistema actualiza administrador en BD
+9. Usuario ve los cambios instantáneamente ✨
+```
+
+**Registrar un Egreso:**
+```
+1. Usuario registra egreso de S/. 200.00
+2. Sistema guarda egreso en BD
+3. Sistema recalcula totalEgresos del balance
+4. Sistema recalcula utilidad del balance
+5. Sistema actualiza balance en BD
+6. Sistema actualiza selectedBalance en estado ✨ (vista se actualiza)
+7. Sistema recalcula utilidadTotal del administrador
+8. Sistema actualiza administrador en BD
+9. Usuario ve los cambios instantáneamente ✨
+```
+
+**Dashboard - Utilidad Total:**
+```
+1. Dashboard se carga
+2. Sistema obtiene todos los balances mensuales
+3. Sistema calcula: utilidadTotal = Σ utilidades
+4. Dashboard muestra la utilidad total calculada ✨
+5. Valor siempre actualizado y preciso ✨
+```
+
+### 📊 Ejemplo Completo
+
+**Escenario:**
+```
+ESTADO INICIAL:
+- Balance Enero 2026: utilidad = S/. 0.00
+- Balance Febrero 2026: utilidad = S/. 0.00
+- Utilidad Total: S/. 0.00
+
+PASO 1: Registrar ingreso en Enero (S/. 800.00)
+- Balance Enero: totalIngresos = S/. 800.00, utilidad = S/. 800.00
+- Vista se actualiza INSTANTÁNEAMENTE ✨
+- Utilidad Total actualizada: S/. 800.00 ✨
+
+PASO 2: Registrar egreso en Enero (S/. 200.00)
+- Balance Enero: totalEgresos = S/. 200.00, utilidad = S/. 600.00
+- Vista se actualiza INSTANTÁNEAMENTE ✨
+- Utilidad Total actualizada: S/. 600.00 ✨
+
+PASO 3: Registrar ingreso en Febrero (S/. 1,000.00)
+- Balance Febrero: totalIngresos = S/. 1,000.00, utilidad = S/. 1,000.00
+- Vista se actualiza INSTANTÁNEAMENTE ✨
+- Utilidad Total actualizada: S/. 1,600.00 ✨ (600 + 1000)
+
+RESULTADO DASHBOARD:
+- Utilidad Total: S/. 1,600.00 ✨
+- Calculada desde balances: Enero (600) + Febrero (1000) ✨
+```
+
+### 📝 Archivos modificados
+- `app/dashboard/balances/page.tsx` - Actualización automática de vista y utilidad total
+- `app/dashboard/page.tsx` - Cálculo de utilidad total desde balances mensuales
+
+---
+
 ## [1.0.6] - 2026-07-02
 
 ### ✨ Actualización Automática de Totales en Balance Mensual
