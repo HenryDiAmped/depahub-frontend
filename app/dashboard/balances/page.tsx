@@ -149,9 +149,22 @@ export default function BalancesPage() {
       };
 
       await ingresosApi.create(ingresoData);
+
+      // Recalcular totales del balance
+      const nuevosIngresos = await ingresosApi.getAll(selectedBalance.id);
+      const totalIngresos = nuevosIngresos.reduce((sum, ing) => sum + ing.importe, 0);
+      
+      // Actualizar el balance con el nuevo total de ingresos
+      const utilidad = totalIngresos - selectedBalance.totalEgresos;
+      await balancesApi.update(selectedBalance.id, {
+        ...selectedBalance,
+        totalIngresos,
+        utilidad,
+      });
+
       toast({
         title: "Ingreso registrado",
-        description: "El ingreso se registró correctamente",
+        description: "El ingreso se registró y el balance se actualizó correctamente",
       });
 
       setOpenIngreso(false);
@@ -180,9 +193,22 @@ export default function BalancesPage() {
       };
 
       await egresosApi.create(egresoData);
+
+      // Recalcular totales del balance
+      const nuevosEgresos = await egresosApi.getAll(selectedBalance.id);
+      const totalEgresos = nuevosEgresos.reduce((sum, egr) => sum + egr.importe, 0);
+      
+      // Actualizar el balance con el nuevo total de egresos
+      const utilidad = selectedBalance.totalIngresos - totalEgresos;
+      await balancesApi.update(selectedBalance.id, {
+        ...selectedBalance,
+        totalEgresos,
+        utilidad,
+      });
+
       toast({
         title: "Egreso registrado",
-        description: "El egreso se registró correctamente",
+        description: "El egreso se registró y el balance se actualizó correctamente",
       });
 
       setOpenEgreso(false);

@@ -1,5 +1,68 @@
 # Changelog - DepHub Frontend
 
+## [1.0.6] - 2026-07-02
+
+### ✨ Actualización Automática de Totales en Balance Mensual
+
+#### 1. Recálculo automático al registrar ingresos
+- **Mejora**: Cuando se registra un nuevo ingreso, el `totalIngresos` del balance se actualiza automáticamente.
+- **Implementación**:
+  - Después de crear el ingreso, se obtienen todos los ingresos del balance
+  - Se calcula la suma total de todos los ingresos
+  - Se actualiza el balance con el nuevo `totalIngresos`
+  - Se recalcula la `utilidad` (totalIngresos - totalEgresos)
+- **Beneficio**: Los totales siempre reflejan el estado actual sin necesidad de refrescar manualmente.
+
+#### 2. Recálculo automático al registrar egresos
+- **Mejora**: Cuando se registra un nuevo egreso, el `totalEgresos` del balance se actualiza automáticamente.
+- **Implementación**:
+  - Después de crear el egreso, se obtienen todos los egresos del balance
+  - Se calcula la suma total de todos los egresos
+  - Se actualiza el balance con el nuevo `totalEgresos`
+  - Se recalcula la `utilidad` (totalIngresos - totalEgresos)
+- **Beneficio**: Los totales siempre reflejan el estado actual sin necesidad de refrescar manualmente.
+
+#### 3. Actualización de la utilidad en tiempo real
+- **Mejora**: La utilidad del balance se recalcula automáticamente con cada ingreso o egreso.
+- **Fórmula aplicada**: `utilidad = totalIngresos - totalEgresos`
+- **Beneficio**: El administrador ve en tiempo real la situación financiera del período.
+
+### 🔄 Flujo Mejorado
+
+**Antes:**
+```
+1. Registrar ingreso/egreso
+2. Los totales no se actualizaban
+3. Era necesario recargar la página o backend calculaba mal
+4. Inconsistencia en los datos mostrados
+```
+
+**Ahora:**
+```
+1. Registrar ingreso/egreso
+2. Sistema recalcula totales automáticamente ✨
+3. totalIngresos y totalEgresos se actualizan
+4. Utilidad se recalcula
+5. Vista se actualiza con datos correctos
+6. Todo sucede en una sola operación
+```
+
+### 📊 Ejemplo de Cálculo
+
+**Escenario:**
+- Balance inicial: totalIngresos = S/. 1,000.00, totalEgresos = S/. 500.00
+- Se registra nuevo ingreso: S/. 300.00
+- **Sistema automáticamente**:
+  - Suma todos los ingresos: S/. 1,300.00
+  - Actualiza totalIngresos: S/. 1,300.00
+  - Recalcula utilidad: S/. 1,300.00 - S/. 500.00 = S/. 800.00
+  - Muestra los nuevos totales instantáneamente
+
+### 📝 Archivos modificados
+- `app/dashboard/balances/page.tsx` - Recálculo automático de totales
+
+---
+
 ## [1.0.5] - 2026-07-02
 
 ### ✨ Gestión Automática del Estado de Inmuebles
