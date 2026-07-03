@@ -90,11 +90,26 @@ export default function InquilinosPage() {
         inmueble: formData.inmuebleId ? { id: Number(formData.inmuebleId) } : undefined,
       };
 
+      const inmuebleIdActual = Number(formData.inmuebleId);
+      const inmuebleIdAnterior = editingInquilino?.inmueble?.id;
+
       if (editingInquilino?.id) {
         await inquilinosApi.update(editingInquilino.id, {
           ...inquilinoData,
           id: editingInquilino.id,
         });
+        
+        // Si cambió de inmueble, liberar el anterior
+        if (inmuebleIdAnterior && inmuebleIdAnterior !== inmuebleIdActual) {
+          const inmuebleAnterior = inmuebles.find(i => i.id === inmuebleIdAnterior);
+          if (inmuebleAnterior) {
+            await inmueblesApi.update(inmuebleIdAnterior, {
+              ...inmuebleAnterior,
+              estado: "DISPONIBLE",
+            });
+          }
+        }
+        
         toast({
           title: "Inquilino actualizado",
           description: "El inquilino se actualizó correctamente",
@@ -105,6 +120,17 @@ export default function InquilinosPage() {
           title: "Inquilino creado",
           description: "El inquilino se creó correctamente",
         });
+      }
+
+      // Si se asignó un inmueble, marcarlo como OCUPADO
+      if (inmuebleIdActual) {
+        const inmueble = inmuebles.find(i => i.id === inmuebleIdActual);
+        if (inmueble) {
+          await inmueblesApi.update(inmuebleIdActual, {
+            ...inmueble,
+            estado: "OCUPADO",
+          });
+        }
       }
 
       setOpen(false);
@@ -138,12 +164,26 @@ export default function InquilinosPage() {
       return;
 
     try {
+      const inmuebleId = inquilino.inmueble?.id;
+      
       // Retirar inquilino y desasociar del inmueble
       await inquilinosApi.update(inquilino.id!, {
         ...inquilino,
         estado: "RETIRADO",
         inmueble: undefined, // Desasociar del inmueble
       });
+
+      // Si tenía un inmueble asignado, marcarlo como DISPONIBLE
+      if (inmuebleId) {
+        const inmueble = inmuebles.find(i => i.id === inmuebleId);
+        if (inmueble) {
+          await inmueblesApi.update(inmuebleId, {
+            ...inmueble,
+            estado: "DISPONIBLE",
+          });
+        }
+      }
+
       toast({
         title: "Inquilino retirado",
         description: "El inquilino se marcó como retirado y se liberó el inmueble",
@@ -241,7 +281,6 @@ export default function InquilinosPage() {
                       setFormData({ ...formData, email: e.target.value })
                     }
                     placeholder="correo@ejemplo.com"
-                    required
                   />
                 </div>
                 <div>

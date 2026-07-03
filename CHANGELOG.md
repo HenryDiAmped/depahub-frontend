@@ -1,5 +1,63 @@
 # Changelog - DepHub Frontend
 
+## [1.0.5] - 2026-07-02
+
+### ✨ Gestión Automática del Estado de Inmuebles
+
+#### 1. Cambio automático a estado OCUPADO
+- **Mejora**: Cuando un inquilino se asigna a un inmueble, el inmueble cambia automáticamente su estado a "OCUPADO".
+- **Flujo implementado**:
+  - Al crear un nuevo inquilino con inmueble asignado → Inmueble cambia a OCUPADO
+  - Al editar un inquilino y asignarle un inmueble → Inmueble cambia a OCUPADO
+  - Al editar un inquilino y cambiar de inmueble → Inmueble anterior vuelve a DISPONIBLE, nuevo inmueble cambia a OCUPADO
+- **Beneficio**: Eliminación de inconsistencias entre el estado del inmueble y la asignación de inquilinos.
+
+#### 2. Cambio automático a estado DISPONIBLE
+- **Mejora**: Cuando un inquilino se retira, el inmueble que ocupaba vuelve automáticamente a estado "DISPONIBLE".
+- **Flujo implementado**:
+  - Al retirar un inquilino → Inquilino cambia a RETIRADO
+  - Al retirar un inquilino → Se desasocia del inmueble
+  - Al retirar un inquilino → Inmueble cambia a DISPONIBLE
+- **Beneficio**: El inmueble queda disponible automáticamente para ser asignado a otro inquilino.
+
+#### 3. Corrección: Email realmente opcional
+- **Fix**: Removido el atributo `required` del campo email que se había dejado por error.
+- **Estado**: Email ahora es completamente opcional en el formulario.
+
+### 🔄 Flujos Automatizados
+
+**Crear Inquilino con Inmueble:**
+```
+1. Usuario crea inquilino
+2. Usuario selecciona inmueble disponible
+3. Sistema guarda inquilino con inmueble asignado
+4. Sistema cambia estado del inmueble a OCUPADO ✨
+5. Usuario ve inmueble marcado como ocupado
+```
+
+**Retirar Inquilino:**
+```
+1. Usuario retira inquilino
+2. Sistema cambia estado del inquilino a RETIRADO
+3. Sistema desasocia inquilino del inmueble
+4. Sistema cambia estado del inmueble a DISPONIBLE ✨
+5. Usuario ve inmueble disponible para nuevo inquilino
+```
+
+**Cambiar Inmueble de Inquilino:**
+```
+1. Usuario edita inquilino
+2. Usuario selecciona nuevo inmueble
+3. Sistema actualiza inquilino con nuevo inmueble
+4. Sistema cambia inmueble anterior a DISPONIBLE ✨
+5. Sistema cambia nuevo inmueble a OCUPADO ✨
+```
+
+### 📝 Archivos modificados
+- `app/dashboard/inquilinos/page.tsx` - Gestión automática del estado de inmuebles
+
+---
+
 ## [1.0.4] - 2026-07-02
 
 ### ✨ Mejoras en Mensajes de Error y Visualización de Datos
