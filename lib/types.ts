@@ -50,6 +50,7 @@ export interface Inquilino {
   estado: EstadoInquilino;
   inmueble?: {
     id: number;
+    precioBase?: number;
     propiedad?: {
       id: number;
       nombre?: string;

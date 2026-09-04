@@ -64,7 +64,13 @@ export default function ContratosPage() {
         inquilinosApi.getAll(),
       ]);
       setContratos(contratosData);
-      setInquilinos(inquilinosData.filter((i) => i.estado === "ACTIVO"));
+      setInquilinos(
+        inquilinosData.filter(
+          (inquilino) =>
+            inquilino.estado === "ACTIVO" &&
+            inquilino.inmueble?.propiedad?.administrador?.id === admin.id
+        )
+      );
     } catch (error) {
       toast({
         variant: "destructive",
@@ -124,6 +130,22 @@ export default function ContratosPage() {
     });
   };
 
+  const handleInquilinoChange = (inquilinoId: string) => {
+    const inquilinoSeleccionado = inquilinos.find(
+      (inquilino) => inquilino.id === Number(inquilinoId)
+    );
+    const precioBase = inquilinoSeleccionado?.inmueble?.precioBase;
+
+    setFormData((currentFormData) => ({
+      ...currentFormData,
+      inquilinoId,
+      ...(precioBase !== undefined && {
+        montoAlquiler: precioBase.toString(),
+        garantia: precioBase.toString(),
+      }),
+    }));
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -151,9 +173,7 @@ export default function ContratosPage() {
                   <Label htmlFor="inquilino">Inquilino</Label>
                   <Select
                     value={formData.inquilinoId}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, inquilinoId: value })
-                    }
+                    onValueChange={handleInquilinoChange}
                     required
                   >
                     <SelectTrigger>
