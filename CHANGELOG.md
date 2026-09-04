@@ -1,4 +1,4 @@
-# Changelog - DepHub Frontend
+# Changelog - DepaHub Frontend
 
 ## [1.0.7] - 2026-07-02
 

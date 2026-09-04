@@ -4,7 +4,7 @@ import { AuthProvider } from "@/contexts/auth-context";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "DepHub - Sistema de Gestión de Alquileres",
+  title: "DepaHub - Sistema de Gestión de Alquileres",
   description: "Plataforma centralizada para gestión de propiedades e inquilinos",
 };
 

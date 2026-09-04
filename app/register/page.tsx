@@ -70,7 +70,7 @@ export default function RegisterPage() {
             </div>
           </div>
           <CardTitle className="text-2xl text-center">
-            Crear Cuenta en DepHub
+            Crear Cuenta en DepaHub
           </CardTitle>
           <CardDescription className="text-center">
             Completa el formulario para registrarte

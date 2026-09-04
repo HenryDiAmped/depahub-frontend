@@ -58,13 +58,24 @@ export default function InquilinosPage() {
   }, [admin]);
 
   const fetchData = async () => {
+    if (!admin?.id) return;
+
     try {
       const [inquilinosData, inmueblesData] = await Promise.all([
         inquilinosApi.getAll(),
         inmueblesApi.getAll(),
       ]);
-      setInquilinos(inquilinosData);
-      setInmuebles(inmueblesData);
+
+      const inmueblesDelAdministrador = inmueblesData.filter(
+        (inmueble) => inmueble.propiedad?.administrador?.id === admin.id
+      );
+      const inquilinosDelAdministrador = inquilinosData.filter(
+        (inquilino) =>
+          inquilino.inmueble?.propiedad?.administrador?.id === admin.id
+      );
+
+      setInquilinos(inquilinosDelAdministrador);
+      setInmuebles(inmueblesDelAdministrador);
     } catch (error) {
       toast({
         variant: "destructive",

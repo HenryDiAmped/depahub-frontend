@@ -1,4 +1,4 @@
-# 🔧 Troubleshooting - DepHub Frontend
+# 🔧 Troubleshooting - DepaHub Frontend
 
 ## Problemas Comunes y Soluciones
 

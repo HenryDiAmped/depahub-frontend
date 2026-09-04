@@ -1,4 +1,4 @@
-# 🎉 DepHub Frontend - Implementación Completa
+# 🎉 DepaHub Frontend - Implementación Completa
 
 ## ✅ PROYECTO TERMINADO Y FUNCIONAL
 
@@ -469,7 +469,7 @@ pnpm start
 ███████████████████████████████ 100% COMPLETADO
 ```
 
-**El frontend de DepHub está completamente implementado, probado y listo para usar.**
+**El frontend de DepaHub está completamente implementado, probado y listo para usar.**
 
 ---
 

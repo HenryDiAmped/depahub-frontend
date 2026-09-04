@@ -1,9 +1,9 @@
-# 📊 Resumen del Proyecto DepHub Frontend
+# 📊 Resumen del Proyecto DepaHub Frontend
 
 ## ✅ Estado del Proyecto: COMPLETADO
 
 ### 🎯 Objetivo
-Desarrollar el frontend completo del sistema de gestión de alquileres DepHub, consumiendo la API REST disponible en `localhost:8080`.
+Desarrollar el frontend completo del sistema de gestión de alquileres DepaHub, consumiendo la API REST disponible en `localhost:8080`.
 
 ---
 
@@ -406,7 +406,7 @@ Ver Inquilino → Retirar → Actualizar Estados Automáticos
 
 ## 🎉 Conclusión
 
-El proyecto **DepHub Frontend** está **100% completo** y listo para desarrollo. Incluye:
+El proyecto **DepaHub Frontend** está **100% completo** y listo para desarrollo. Incluye:
 
 - ✅ 8 módulos principales funcionales
 - ✅ Autenticación y autorización

@@ -1,4 +1,4 @@
-# 🏁 COMIENZA AQUÍ - DepHub Frontend
+# 🏁 COMIENZA AQUÍ - DepaHub Frontend
 
 ## ⚡ Inicio Rápido (3 pasos)
 
@@ -231,7 +231,7 @@ Y abre: **http://localhost:3000**
 
 ---
 
-**¡Disfruta gestionando tus propiedades con DepHub! 🏠✨**
+**¡Disfruta gestionando tus propiedades con DepaHub! 🏠✨**
 
 ---
 

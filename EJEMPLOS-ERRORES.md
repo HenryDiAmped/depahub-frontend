@@ -1,4 +1,4 @@
-# 📋 Ejemplos de Mensajes de Error - DepHub Frontend
+# 📋 Ejemplos de Mensajes de Error - DepaHub Frontend
 
 Este documento muestra los diferentes mensajes de error que el sistema muestra al usuario según el tipo de problema.
 

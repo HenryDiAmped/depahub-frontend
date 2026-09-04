@@ -1,4 +1,4 @@
-# 🚀 Guía de Inicio Rápido - DepHub Frontend
+# 🚀 Guía de Inicio Rápido - DepaHub Frontend
 
 ## Prerrequisitos
 
@@ -248,4 +248,4 @@ Para dudas o problemas:
 
 ---
 
-**¡Listo! Ya puedes gestionar tus propiedades e inquilinos con DepHub 🏠**
+**¡Listo! Ya puedes gestionar tus propiedades e inquilinos con DepaHub 🏠**

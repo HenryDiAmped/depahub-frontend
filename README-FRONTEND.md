@@ -1,4 +1,4 @@
-# DepHub - Frontend
+# DepaHub - Frontend
 
 Sistema de Gestión de Alquileres - Aplicación Frontend desarrollada con Next.js 16, TypeScript y shadcn/ui.
 

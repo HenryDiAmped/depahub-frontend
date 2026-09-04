@@ -44,7 +44,7 @@ export default function LoginPage() {
               <Building2 className="h-8 w-8 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="text-2xl text-center">Bienvenido a DepHub</CardTitle>
+          <CardTitle className="text-2xl text-center">Bienvenido a DepaHub</CardTitle>
           <CardDescription className="text-center">
             Ingresa tus credenciales para acceder al sistema
           </CardDescription>
