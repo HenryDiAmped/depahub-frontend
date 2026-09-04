@@ -1,26 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 240 10% 3.9%;
+  /* ── Paleta extraída de la imagen de referencia ── */
+  /* Fondo principal: gris-azulado muy claro */
+  --background: 216 33% 95%;
+  /* Texto principal: dark navy */
+  --foreground: 225 30% 15%;
+  /* Cards: blanco puro */
   --card: 0 0% 100%;
-  --card-foreground: 240 10% 3.9%;
+  --card-foreground: 225 30% 15%;
   --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 3.9%;
-  --primary: 221.2 83.2% 53.3%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 240 4.8% 95.9%;
-  --secondary-foreground: 240 5.9% 10%;
-  --muted: 240 4.8% 95.9%;
-  --muted-foreground: 240 3.8% 46.1%;
-  --accent: 240 4.8% 95.9%;
-  --accent-foreground: 240 5.9% 10%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 240 5.9% 90%;
-  --input: 240 5.9% 90%;
-  --ring: 221.2 83.2% 53.3%;
-  --radius: 0.5rem;
+  --popover-foreground: 225 30% 15%;
+  /* Primary: coral/salmón de los botones de acción */
+  --primary: 4 100% 70%;
+  --primary-foreground: 0 0% 100%;
+  /* Secondary: verde claro de los badges positivos */
+  --secondary: 131 44% 62%;
+  --secondary-foreground: 0 0% 100%;
+  /* Muted: gris suave para textos secundarios */
+  --muted: 220 20% 92%;
+  --muted-foreground: 220 10% 50%;
+  /* Accent: hover sobre items de nav */
+  --accent: 225 30% 22%;
+  --accent-foreground: 0 0% 100%;
+  /* Destructive */
+  --destructive: 4 100% 60%;
+  --destructive-foreground: 0 0% 100%;
+  /* Bordes sutiles */
+  --border: 220 15% 88%;
+  --input: 220 15% 88%;
+  --ring: 4 100% 70%;
+  /* Sidebar dark navy */
+  --sidebar: 229 29% 17%;
+  --sidebar-foreground: 220 20% 85%;
+  --sidebar-active: 225 30% 22%;
+  --radius: 0.625rem;
 }
 
 @theme inline {
@@ -43,6 +57,9 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-active: hsl(var(--sidebar-active));
 }
 
 body {

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -29,7 +28,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Users, Edit, UserX } from "lucide-react";
+import { Plus, Users, Edit, UserX, Phone, Mail, Home } from "lucide-react";
 import { inquilinosApi, inmueblesApi } from "@/lib/api";
 import type { Inquilino, Inmueble, EstadoInquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
@@ -95,7 +94,7 @@ export default function InquilinosPage() {
         nombreCompleto: formData.nombreCompleto,
         dni: formData.dni,
         telefono: formData.telefono,
-        email: formData.email || "", // Email opcional
+        email: formData.email || "",
         fechaNacimiento: formData.fechaNacimiento,
         estado: formData.estado,
         inmueble: formData.inmuebleId ? { id: Number(formData.inmuebleId) } : undefined,
@@ -109,8 +108,7 @@ export default function InquilinosPage() {
           ...inquilinoData,
           id: editingInquilino.id,
         });
-        
-        // Si cambió de inmueble, liberar el anterior
+
         if (inmuebleIdAnterior && inmuebleIdAnterior !== inmuebleIdActual) {
           const inmuebleAnterior = inmuebles.find(i => i.id === inmuebleIdAnterior);
           if (inmuebleAnterior) {
@@ -120,7 +118,7 @@ export default function InquilinosPage() {
             });
           }
         }
-        
+
         toast({
           title: "Inquilino actualizado",
           description: "El inquilino se actualizó correctamente",
@@ -133,7 +131,6 @@ export default function InquilinosPage() {
         });
       }
 
-      // Si se asignó un inmueble, marcarlo como OCUPADO
       if (inmuebleIdActual) {
         const inmueble = inmuebles.find(i => i.id === inmuebleIdActual);
         if (inmueble) {
@@ -176,15 +173,13 @@ export default function InquilinosPage() {
 
     try {
       const inmuebleId = inquilino.inmueble?.id;
-      
-      // Retirar inquilino y desasociar del inmueble
+
       await inquilinosApi.update(inquilino.id!, {
         ...inquilino,
         estado: "RETIRADO",
-        inmueble: undefined, // Desasociar del inmueble
+        inmueble: undefined,
       });
 
-      // Si tenía un inmueble asignado, marcarlo como DISPONIBLE
       if (inmuebleId) {
         const inmueble = inmuebles.find(i => i.id === inmuebleId);
         if (inmueble) {
@@ -230,21 +225,30 @@ export default function InquilinosPage() {
 
   return (
     <div className="space-y-6">
+      {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Inquilinos</h1>
-          <p className="text-muted-foreground">Gestiona los inquilinos</p>
+          <h1 className="text-2xl font-bold uppercase tracking-wide text-foreground">
+            Inquilinos
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Gestiona los inquilinos
+          </p>
         </div>
+
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={resetForm}>
+            <Button
+              onClick={resetForm}
+              className="bg-[hsl(4,100%,70%)] text-white font-bold uppercase tracking-wider hover:bg-[hsl(4,100%,62%)] shadow-md rounded-lg"
+            >
               <Plus className="mr-2 h-4 w-4" />
               Nuevo Inquilino
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl rounded-2xl">
             <DialogHeader>
-              <DialogTitle>
+              <DialogTitle className="font-bold uppercase tracking-wide">
                 {editingInquilino ? "Editar Inquilino" : "Nuevo Inquilino"}
               </DialogTitle>
               <DialogDescription>
@@ -252,9 +256,11 @@ export default function InquilinosPage() {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="nombreCompleto">Nombre Completo</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Nombre Completo
+                  </Label>
                   <Input
                     id="nombreCompleto"
                     value={formData.nombreCompleto}
@@ -262,10 +268,13 @@ export default function InquilinosPage() {
                       setFormData({ ...formData, nombreCompleto: e.target.value })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="dni">DNI</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    DNI
+                  </Label>
                   <Input
                     id="dni"
                     value={formData.dni}
@@ -273,10 +282,13 @@ export default function InquilinosPage() {
                       setFormData({ ...formData, dni: e.target.value })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="telefono">Teléfono</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Teléfono
+                  </Label>
                   <Input
                     id="telefono"
                     value={formData.telefono}
@@ -284,10 +296,13 @@ export default function InquilinosPage() {
                       setFormData({ ...formData, telefono: e.target.value })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="email">Email (opcional)</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Email (opcional)
+                  </Label>
                   <Input
                     id="email"
                     type="email"
@@ -296,10 +311,13 @@ export default function InquilinosPage() {
                       setFormData({ ...formData, email: e.target.value })
                     }
                     placeholder="correo@ejemplo.com"
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="fechaNacimiento">Fecha de Nacimiento</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Fecha de Nacimiento
+                  </Label>
                   <Input
                     id="fechaNacimiento"
                     type="date"
@@ -311,17 +329,20 @@ export default function InquilinosPage() {
                       })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="inmueble">Inmueble</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Inmueble
+                  </Label>
                   <Select
                     value={formData.inmuebleId}
                     onValueChange={(value) =>
                       setFormData({ ...formData, inmuebleId: value })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-10 rounded-lg mt-1">
                       <SelectValue placeholder="Seleccionar inmueble" />
                     </SelectTrigger>
                     <SelectContent>
@@ -342,86 +363,131 @@ export default function InquilinosPage() {
                   </Select>
                 </div>
               </div>
-              <DialogFooter className="mt-6">
+              <DialogFooter className="mt-6 gap-2">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setOpen(false)}
+                  className="rounded-lg"
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">Guardar</Button>
+                <Button
+                  type="submit"
+                  className="bg-[hsl(4,100%,70%)] text-white hover:bg-[hsl(4,100%,62%)] rounded-lg font-bold uppercase tracking-wider"
+                >
+                  Guardar
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
+      {/* Content */}
       {isLoading ? (
-        <div className="text-center py-8">Cargando inquilinos...</div>
+        <div className="text-center py-8 text-muted-foreground">
+          Cargando inquilinos...
+        </div>
       ) : inquilinos.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center">
-            <Users className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-2 text-lg font-semibold">
+        <Card className="border-0 shadow-sm">
+          <CardContent className="py-12 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(229,29%,20%)]">
+              <Users className="h-8 w-8 text-white" />
+            </div>
+            <h3 className="mt-4 text-base font-bold uppercase tracking-wide">
               No hay inquilinos registrados
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               Comienza agregando tu primer inquilino
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {inquilinos.map((inquilino) => (
-            <Card key={inquilino.id}>
-              <CardHeader>
-                <CardTitle className="flex items-start justify-between">
-                  <span>{inquilino.nombreCompleto}</span>
-                  <Badge
-                    variant={
-                      inquilino.estado === "ACTIVO" ? "default" : "secondary"
-                    }
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {inquilinos.map((inquilino) => {
+            const isActivo = inquilino.estado === "ACTIVO";
+            return (
+              <Card
+                key={inquilino.id}
+                className="overflow-hidden border-0 shadow-sm hover:shadow-md transition-shadow"
+              >
+                {/* Card header: dark navy */}
+                <CardHeader
+                  className="px-4 py-3 flex flex-row items-center justify-between space-y-0"
+                  style={{ background: "hsl(229,29%,20%)" }}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${isActivo ? "bg-[hsl(131,44%,62%)]" : "bg-[hsl(229,29%,35%)]"}`}>
+                      <Users className="h-4 w-4 text-white" />
+                    </div>
+                    <CardTitle className="text-sm font-bold uppercase tracking-wider text-white truncate">
+                      {inquilino.nombreCompleto}
+                    </CardTitle>
+                  </div>
+                  <span
+                    className={`shrink-0 ml-2 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${
+                      isActivo
+                        ? "bg-[hsl(131,44%,62%)] text-white"
+                        : "bg-[hsl(229,29%,35%)] text-white/70"
+                    }`}
                   >
                     {inquilino.estado}
-                  </Badge>
-                </CardTitle>
-                <CardDescription>DNI: {inquilino.dni}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-1 text-sm">
-                  {inquilino.email && <p>📧 {inquilino.email}</p>}
-                  <p>📞 {inquilino.telefono}</p>
-                  <p>🎂 {inquilino.fechaNacimiento}</p>
-                  {inquilino.inmueble?.id && (
-                    <p className="font-medium text-primary">
-                      🏠 {inmuebles.find(i => i.id === inquilino.inmueble?.id)?.nombre || `Inmueble #${inquilino.inmueble.id}`}
-                    </p>
+                  </span>
+                </CardHeader>
+
+                {/* Card body: white */}
+                <CardContent className="bg-white px-4 pt-3 pb-4 space-y-1.5">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    DNI: {inquilino.dni}
+                  </p>
+                  {inquilino.email && (
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <Mail className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">{inquilino.email}</span>
+                    </div>
                   )}
-                </div>
-                <div className="mt-4 flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(inquilino)}
-                  >
-                    <Edit className="mr-1 h-3 w-3" />
-                    Editar
-                  </Button>
-                  {inquilino.estado === "ACTIVO" && (
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Phone className="h-3.5 w-3.5 shrink-0" />
+                    <span>{inquilino.telefono}</span>
+                  </div>
+                  {inquilino.inmueble?.id && (
+                    <div className="flex items-center gap-1.5 text-sm font-semibold text-[hsl(131,44%,48%)]">
+                      <Home className="h-3.5 w-3.5 shrink-0" />
+                      <span>
+                        {inmuebles.find(i => i.id === inquilino.inmueble?.id)?.nombre ||
+                          `Inmueble #${inquilino.inmueble.id}`}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Action buttons */}
+                  <div className="pt-2 flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleRetirar(inquilino)}
+                      onClick={() => handleEdit(inquilino)}
+                      className="rounded-lg text-xs font-semibold uppercase tracking-wider h-8"
                     >
-                      <UserX className="mr-1 h-3 w-3" />
-                      Retirar
+                      <Edit className="mr-1 h-3 w-3" />
+                      Editar
                     </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                    {isActivo && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleRetirar(inquilino)}
+                        className="rounded-lg text-xs font-semibold uppercase tracking-wider h-8 text-[hsl(4,100%,62%)] border-[hsl(4,100%,70%)] hover:bg-[hsl(4,100%,70%)] hover:text-white"
+                      >
+                        <UserX className="mr-1 h-3 w-3" />
+                        Retirar
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

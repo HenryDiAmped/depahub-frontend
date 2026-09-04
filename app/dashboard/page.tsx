@@ -5,7 +5,6 @@ import { useAuth } from "@/contexts/auth-context";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -96,31 +95,55 @@ export default function DashboardPage() {
     },
   ];
 
+  const iconColors = [
+    "bg-[hsl(229,29%,30%)]",  // navy para propiedades
+    "bg-[hsl(4,100%,70%)]",   // coral para inmuebles
+    "bg-[hsl(131,44%,62%)]",  // verde para inquilinos
+    "bg-[hsl(229,29%,30%)]",  // navy para contratos
+  ];
+
   return (
     <div className="space-y-6">
+      {/* Page header */}
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl font-bold uppercase tracking-wide text-foreground">
+          Dashboard
+        </h1>
+        <p className="text-sm text-muted-foreground mt-0.5">
           Bienvenido, {admin?.nombreCompleto}
         </p>
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8">Cargando estadísticas...</div>
+        <div className="text-center py-8 text-muted-foreground">
+          Cargando estadísticas...
+        </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {statCards.map((card) => {
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {statCards.map((card, i) => {
             const Icon = card.icon;
             return (
-              <Card key={card.title}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+              <Card
+                key={card.title}
+                className="overflow-hidden border-0 shadow-sm"
+              >
+                {/* Header: dark navy strip with title + icon pill */}
+                <CardHeader className="bg-[hsl(229,29%,20%)] px-4 py-3 space-y-0 flex flex-row items-center justify-between">
+                  <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[hsl(220,20%,75%)]">
                     {card.title}
                   </CardTitle>
-                  <Icon className="h-4 w-4 text-muted-foreground" />
+                  <div
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${iconColors[i]}`}
+                  >
+                    <Icon className="h-4 w-4 text-white" />
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{card.value}</div>
+
+                {/* Body: white background */}
+                <CardContent className="bg-white px-4 pt-4 pb-5">
+                  <div className="text-3xl font-bold text-foreground">
+                    {card.value}
+                  </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     {card.description}
                   </p>
@@ -131,17 +154,20 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Utilidad Total</CardTitle>
-          <CardDescription>
-            Ganancia acumulada de todos los períodos
-          </CardDescription>
+      {/* Utilidad total */}
+      <Card className="overflow-hidden border-0 shadow-sm">
+        <CardHeader className="bg-[hsl(229,29%,20%)] px-4 py-3">
+          <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[hsl(220,20%,75%)]">
+            Utilidad Total
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">
+        <CardContent className="bg-white px-4 pt-4 pb-5">
+          <div className="text-3xl font-bold text-[hsl(4,100%,62%)]">
             S/. {utilidadTotal.toFixed(2)}
           </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Ganancia acumulada de todos los períodos
+          </p>
         </CardContent>
       </Card>
     </div>

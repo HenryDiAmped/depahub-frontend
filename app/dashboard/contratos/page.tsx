@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -26,11 +25,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, FileText } from "lucide-react";
+import { Plus, FileText, CalendarDays, DollarSign } from "lucide-react";
 import { contratosApi, inquilinosApi } from "@/lib/api";
 import type { Contrato, Inquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
@@ -146,37 +144,59 @@ export default function ContratosPage() {
     }));
   };
 
+  // Helpers de estado
+  const estadoStyle = (estado: string) => {
+    if (estado === "ACTIVO")
+      return "bg-[hsl(131,44%,62%)] text-white";
+    if (estado === "FINALIZADO")
+      return "bg-[hsl(229,29%,35%)] text-white/80";
+    return "bg-[hsl(4,100%,70%)] text-white";
+  };
+
   return (
     <div className="space-y-6">
+      {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Contratos</h1>
-          <p className="text-muted-foreground">Gestiona los contratos de alquiler</p>
+          <h1 className="text-2xl font-bold uppercase tracking-wide text-foreground">
+            Contratos
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Gestiona los contratos de alquiler
+          </p>
         </div>
+
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={resetForm}>
+            <Button
+              onClick={resetForm}
+              className="bg-[hsl(4,100%,70%)] text-white font-bold uppercase tracking-wider hover:bg-[hsl(4,100%,62%)] shadow-md rounded-lg"
+            >
               <Plus className="mr-2 h-4 w-4" />
               Nuevo Contrato
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl rounded-2xl">
             <DialogHeader>
-              <DialogTitle>Nuevo Contrato</DialogTitle>
+              <DialogTitle className="font-bold uppercase tracking-wide">
+                Nuevo Contrato
+              </DialogTitle>
               <DialogDescription>
                 Complete los datos del contrato
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
-                  <Label htmlFor="inquilino">Inquilino</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Inquilino
+                  </Label>
                   <Select
                     value={formData.inquilinoId}
                     onValueChange={handleInquilinoChange}
                     required
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-10 rounded-lg mt-1">
                       <SelectValue placeholder="Seleccionar inquilino" />
                     </SelectTrigger>
                     <SelectContent>
@@ -192,7 +212,9 @@ export default function ContratosPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="fechaInicio">Fecha Inicio</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Fecha Inicio
+                  </Label>
                   <Input
                     id="fechaInicio"
                     type="date"
@@ -201,10 +223,13 @@ export default function ContratosPage() {
                       setFormData({ ...formData, fechaInicio: e.target.value })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="fechaFin">Fecha Fin</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Fecha Fin
+                  </Label>
                   <Input
                     id="fechaFin"
                     type="date"
@@ -213,10 +238,13 @@ export default function ContratosPage() {
                       setFormData({ ...formData, fechaFin: e.target.value })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="montoAlquiler">Monto Alquiler (S/.)</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Monto Alquiler (S/.)
+                  </Label>
                   <Input
                     id="montoAlquiler"
                     type="number"
@@ -226,10 +254,13 @@ export default function ContratosPage() {
                       setFormData({ ...formData, montoAlquiler: e.target.value })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="garantia">Garantía (S/.)</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Garantía (S/.)
+                  </Label>
                   <Input
                     id="garantia"
                     type="number"
@@ -239,10 +270,13 @@ export default function ContratosPage() {
                       setFormData({ ...formData, garantia: e.target.value })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div className="col-span-2">
-                  <Label htmlFor="condiciones">Condiciones</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Condiciones
+                  </Label>
                   <Textarea
                     id="condiciones"
                     value={formData.condiciones}
@@ -250,77 +284,108 @@ export default function ContratosPage() {
                       setFormData({ ...formData, condiciones: e.target.value })
                     }
                     placeholder="Ej: Pago mensual, mantenimiento incluido..."
+                    className="rounded-lg mt-1"
                   />
                 </div>
               </div>
-              <DialogFooter className="mt-6">
+              <DialogFooter className="mt-6 gap-2">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setOpen(false)}
+                  className="rounded-lg"
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">Crear Contrato</Button>
+                <Button
+                  type="submit"
+                  className="bg-[hsl(4,100%,70%)] text-white hover:bg-[hsl(4,100%,62%)] rounded-lg font-bold uppercase tracking-wider"
+                >
+                  Crear Contrato
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
+      {/* Content */}
       {isLoading ? (
-        <div className="text-center py-8">Cargando contratos...</div>
+        <div className="text-center py-8 text-muted-foreground">
+          Cargando contratos...
+        </div>
       ) : contratos.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center">
-            <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-2 text-lg font-semibold">
+        <Card className="border-0 shadow-sm">
+          <CardContent className="py-12 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(229,29%,20%)]">
+              <FileText className="h-8 w-8 text-white" />
+            </div>
+            <h3 className="mt-4 text-base font-bold uppercase tracking-wide">
               No hay contratos registrados
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               Comienza creando tu primer contrato
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           {contratos.map((contrato) => (
-            <Card key={contrato.id}>
-              <CardHeader>
-                <CardTitle className="flex items-start justify-between">
-                  <span>Contrato #{contrato.id}</span>
-                  <Badge
-                    variant={
-                      contrato.estado === "ACTIVO" ? "default" : "secondary"
-                    }
-                  >
-                    {contrato.estado}
-                  </Badge>
-                </CardTitle>
-                <CardDescription>
-                  {contrato.fechaInicio} - {contrato.fechaFin}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Alquiler:</span>
-                    <span className="font-medium">
-                      S/. {contrato.montoAlquiler.toFixed(2)}
-                    </span>
+            <Card
+              key={contrato.id}
+              className="overflow-hidden border-0 shadow-sm hover:shadow-md transition-shadow"
+            >
+              {/* Header: dark navy */}
+              <CardHeader
+                className="px-4 py-3 flex flex-row items-center justify-between space-y-0"
+                style={{ background: "hsl(229,29%,20%)" }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[hsl(229,29%,32%)]">
+                    <FileText className="h-4 w-4 text-white" />
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Garantía:</span>
-                    <span className="font-medium">
-                      S/. {contrato.garantia.toFixed(2)}
-                    </span>
-                  </div>
-                  {contrato.condiciones && (
-                    <p className="mt-2 text-muted-foreground">
-                      {contrato.condiciones}
-                    </p>
-                  )}
+                  <CardTitle className="text-sm font-bold uppercase tracking-wider text-white">
+                    Contrato #{contrato.id}
+                  </CardTitle>
                 </div>
+                <span
+                  className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${estadoStyle(contrato.estado)}`}
+                >
+                  {contrato.estado}
+                </span>
+              </CardHeader>
+
+              {/* Body: white */}
+              <CardContent className="bg-white px-4 pt-3 pb-4 space-y-2">
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                  <span>
+                    {contrato.fechaInicio} — {contrato.fechaFin}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="rounded-lg bg-[hsl(131,44%,95%)] px-3 py-2">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[hsl(131,44%,40%)]">
+                      Alquiler
+                    </p>
+                    <p className="text-base font-bold text-[hsl(131,44%,40%)]">
+                      S/. {contrato.montoAlquiler.toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-[hsl(229,29%,95%)] px-3 py-2">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[hsl(229,29%,40%)]">
+                      Garantía
+                    </p>
+                    <p className="text-base font-bold text-[hsl(229,29%,40%)]">
+                      S/. {contrato.garantia.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+                {contrato.condiciones && (
+                  <p className="text-xs text-muted-foreground line-clamp-2 pt-1">
+                    {contrato.condiciones}
+                  </p>
+                )}
               </CardContent>
             </Card>
           ))}

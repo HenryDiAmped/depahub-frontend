@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -26,10 +25,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, CreditCard, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
+import { Plus, CreditCard, ArrowUpCircle, ArrowDownCircle, CheckCircle2 } from "lucide-react";
 import { cuentasApi, inquilinosApi } from "@/lib/api";
 import type { Cuenta, Inquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
@@ -151,36 +149,47 @@ export default function CuentasPage() {
 
   return (
     <div className="space-y-6">
+      {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Cuentas</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-bold uppercase tracking-wide text-foreground">
+            Cuentas
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             Gestiona las cuentas por cobrar y por pagar
           </p>
         </div>
+
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={resetForm}>
+            <Button
+              onClick={resetForm}
+              className="bg-[hsl(4,100%,70%)] text-white font-bold uppercase tracking-wider hover:bg-[hsl(4,100%,62%)] shadow-md rounded-lg"
+            >
               <Plus className="mr-2 h-4 w-4" />
               Nueva Cuenta
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl rounded-2xl">
             <DialogHeader>
-              <DialogTitle>Nueva Cuenta</DialogTitle>
+              <DialogTitle className="font-bold uppercase tracking-wide">
+                Nueva Cuenta
+              </DialogTitle>
               <DialogDescription>Complete los datos de la cuenta</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="tipo">Tipo</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Tipo
+                  </Label>
                   <Select
                     value={formData.tipo}
                     onValueChange={(value: any) =>
                       setFormData({ ...formData, tipo: value })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-10 rounded-lg mt-1">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -190,7 +199,9 @@ export default function CuentasPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="inquilino">Inquilino</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Inquilino
+                  </Label>
                   <Select
                     value={formData.inquilinoId}
                     onValueChange={(value) =>
@@ -198,7 +209,7 @@ export default function CuentasPage() {
                     }
                     required
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-10 rounded-lg mt-1">
                       <SelectValue placeholder="Seleccionar inquilino" />
                     </SelectTrigger>
                     <SelectContent>
@@ -214,7 +225,9 @@ export default function CuentasPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="importe">Importe (S/.)</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Importe (S/.)
+                  </Label>
                   <Input
                     id="importe"
                     type="number"
@@ -224,10 +237,13 @@ export default function CuentasPage() {
                       setFormData({ ...formData, importe: e.target.value })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="fechaEmitida">Fecha</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Fecha
+                  </Label>
                   <Input
                     id="fechaEmitida"
                     type="date"
@@ -236,10 +252,13 @@ export default function CuentasPage() {
                       setFormData({ ...formData, fechaEmitida: e.target.value })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div className="col-span-2">
-                  <Label htmlFor="concepto">Concepto</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Concepto
+                  </Label>
                   <Input
                     id="concepto"
                     value={formData.concepto}
@@ -248,123 +267,188 @@ export default function CuentasPage() {
                     }
                     placeholder="Ej: Pago mensualidad julio"
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
               </div>
-              <DialogFooter className="mt-6">
+              <DialogFooter className="mt-6 gap-2">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setOpen(false)}
+                  className="rounded-lg"
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">Crear Cuenta</Button>
+                <Button
+                  type="submit"
+                  className="bg-[hsl(4,100%,70%)] text-white hover:bg-[hsl(4,100%,62%)] rounded-lg font-bold uppercase tracking-wider"
+                >
+                  Crear Cuenta
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Por Cobrar</CardTitle>
-            <ArrowUpCircle className="h-4 w-4 text-green-600" />
+      {/* Resumen stat cards */}
+      <div className="grid gap-4 md:grid-cols-2">
+        {/* Por Cobrar */}
+        <Card className="overflow-hidden border-0 shadow-sm">
+          <CardHeader
+            className="px-4 py-3 flex flex-row items-center justify-between space-y-0"
+            style={{ background: "hsl(229,29%,20%)" }}
+          >
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[hsl(220,20%,75%)]">
+              Por Cobrar
+            </CardTitle>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[hsl(131,44%,62%)]">
+              <ArrowUpCircle className="h-4 w-4 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+          <CardContent className="bg-white px-4 pt-4 pb-5">
+            <div className="text-3xl font-bold text-[hsl(131,44%,45%)]">
               S/. {totalPorCobrar.toFixed(2)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {cuentasPendientes.filter((c) => c.tipo === "POR_COBRAR").length}{" "}
-              cuentas pendientes
+              {cuentasPendientes.filter((c) => c.tipo === "POR_COBRAR").length} cuentas pendientes
             </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Por Pagar</CardTitle>
-            <ArrowDownCircle className="h-4 w-4 text-red-600" />
+
+        {/* Por Pagar */}
+        <Card className="overflow-hidden border-0 shadow-sm">
+          <CardHeader
+            className="px-4 py-3 flex flex-row items-center justify-between space-y-0"
+            style={{ background: "hsl(229,29%,20%)" }}
+          >
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[hsl(220,20%,75%)]">
+              Por Pagar
+            </CardTitle>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[hsl(4,100%,70%)]">
+              <ArrowDownCircle className="h-4 w-4 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+          <CardContent className="bg-white px-4 pt-4 pb-5">
+            <div className="text-3xl font-bold text-[hsl(4,100%,62%)]">
               S/. {totalPorPagar.toFixed(2)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {cuentasPendientes.filter((c) => c.tipo === "POR_PAGAR").length}{" "}
-              cuentas pendientes
+              {cuentasPendientes.filter((c) => c.tipo === "POR_PAGAR").length} cuentas pendientes
             </p>
           </CardContent>
         </Card>
       </div>
 
+      {/* Listado */}
       {isLoading ? (
-        <div className="text-center py-8">Cargando cuentas...</div>
+        <div className="text-center py-8 text-muted-foreground">
+          Cargando cuentas...
+        </div>
       ) : cuentas.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center">
-            <CreditCard className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-2 text-lg font-semibold">
+        <Card className="border-0 shadow-sm">
+          <CardContent className="py-12 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(229,29%,20%)]">
+              <CreditCard className="h-8 w-8 text-white" />
+            </div>
+            <h3 className="mt-4 text-base font-bold uppercase tracking-wide">
               No hay cuentas registradas
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               Comienza registrando tu primera cuenta
             </p>
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>Listado de Cuentas</CardTitle>
+        <Card className="overflow-hidden border-0 shadow-sm">
+          <CardHeader
+            className="px-4 py-3"
+            style={{ background: "hsl(229,29%,20%)" }}
+          >
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[hsl(220,20%,75%)]">
+              Listado de Cuentas
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {cuentas.map((cuenta) => (
-                <div
-                  key={cuenta.id}
-                  className="flex items-center justify-between border-b pb-4 last:border-0"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant={
-                          cuenta.tipo === "POR_COBRAR" ? "default" : "secondary"
-                        }
+          <CardContent className="bg-white p-0">
+            <div className="divide-y divide-border">
+              {cuentas.map((cuenta) => {
+                const esCobrar = cuenta.tipo === "POR_COBRAR";
+                const isPendiente = cuenta.estado === "PENDIENTE";
+                return (
+                  <div
+                    key={cuenta.id}
+                    className="flex items-center justify-between px-4 py-3 hover:bg-[hsl(220,20%,98%)] transition-colors"
+                  >
+                    <div className="flex items-start gap-3">
+                      {/* Tipo icon */}
+                      <div
+                        className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+                          esCobrar
+                            ? "bg-[hsl(131,44%,62%)]"
+                            : "bg-[hsl(4,100%,70%)]"
+                        }`}
                       >
-                        {cuenta.tipo}
-                      </Badge>
-                      <Badge
-                        variant={
-                          cuenta.estado === "PENDIENTE"
-                            ? "destructive"
-                            : "default"
-                        }
-                      >
-                        {cuenta.estado}
-                      </Badge>
+                        {esCobrar ? (
+                          <ArrowUpCircle className="h-4 w-4 text-white" />
+                        ) : (
+                          <ArrowDownCircle className="h-4 w-4 text-white" />
+                        )}
+                      </div>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`text-[10px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-full ${
+                              esCobrar
+                                ? "bg-[hsl(131,44%,92%)] text-[hsl(131,44%,38%)]"
+                                : "bg-[hsl(4,100%,95%)] text-[hsl(4,100%,50%)]"
+                            }`}
+                          >
+                            {cuenta.tipo.replace("_", " ")}
+                          </span>
+                          <span
+                            className={`text-[10px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-full ${
+                              isPendiente
+                                ? "bg-amber-100 text-amber-700"
+                                : "bg-[hsl(131,44%,92%)] text-[hsl(131,44%,38%)]"
+                            }`}
+                          >
+                            {cuenta.estado}
+                          </span>
+                        </div>
+                        <p className="text-sm font-semibold text-foreground">
+                          {cuenta.concepto}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {cuenta.fechaEmitida}
+                        </p>
+                      </div>
                     </div>
-                    <p className="font-medium">{cuenta.concepto}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Fecha: {cuenta.fechaEmitida}
-                    </p>
-                  </div>
-                  <div className="text-right space-y-2">
-                    <p className="text-xl font-bold">
-                      S/. {cuenta.importe.toFixed(2)}
-                    </p>
-                    {cuenta.estado === "PENDIENTE" && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleMarcarSaldada(cuenta)}
+
+                    <div className="text-right space-y-1.5">
+                      <p
+                        className={`text-lg font-bold ${
+                          esCobrar
+                            ? "text-[hsl(131,44%,45%)]"
+                            : "text-[hsl(4,100%,62%)]"
+                        }`}
                       >
-                        Marcar Saldada
-                      </Button>
-                    )}
+                        S/. {cuenta.importe.toFixed(2)}
+                      </p>
+                      {isPendiente && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleMarcarSaldada(cuenta)}
+                          className="h-7 rounded-lg bg-[hsl(131,44%,62%)] text-white hover:bg-[hsl(131,44%,55%)] text-[10px] font-bold uppercase tracking-wider"
+                        >
+                          <CheckCircle2 className="mr-1 h-3 w-3" />
+                          Saldar
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>

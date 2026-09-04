@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -23,11 +22,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Building2, Edit, Trash2, Eye } from "lucide-react";
+import { Plus, Building2, Edit, Trash2, Eye, MapPin } from "lucide-react";
 import { propiedadesApi } from "@/lib/api";
 import type { Propiedad } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { errorHandlers } from "@/lib/error-handler";
+
+// ── Constantes de color del sistema de diseño ──────────────────────────────
+const NAV_BG = "hsl(229,29%,20%)";
+const CORAL   = "hsl(4,100%,70%)";
+const CORAL_H = "hsl(4,100%,62%)";
 
 export default function PropiedadesPage() {
   const { admin } = useAuth();
@@ -163,23 +167,30 @@ export default function PropiedadesPage() {
 
   return (
     <div className="space-y-6">
+      {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Propiedades</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-bold uppercase tracking-wide text-foreground">
+            Propiedades
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             Gestiona tus propiedades registradas
           </p>
         </div>
+
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={resetForm}>
+            <Button
+              onClick={resetForm}
+              className="bg-[hsl(4,100%,70%)] text-white font-bold uppercase tracking-wider hover:bg-[hsl(4,100%,62%)] shadow-md rounded-lg"
+            >
               <Plus className="mr-2 h-4 w-4" />
               Nueva Propiedad
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="rounded-2xl">
             <DialogHeader>
-              <DialogTitle>
+              <DialogTitle className="font-bold uppercase tracking-wide">
                 {editingPropiedad ? "Editar Propiedad" : "Nueva Propiedad"}
               </DialogTitle>
               <DialogDescription>
@@ -187,9 +198,11 @@ export default function PropiedadesPage() {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div>
-                  <Label htmlFor="nombre">Nombre</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Nombre
+                  </Label>
                   <Input
                     id="nombre"
                     value={formData.nombre}
@@ -197,10 +210,13 @@ export default function PropiedadesPage() {
                       setFormData({ ...formData, nombre: e.target.value })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="direccion">Dirección</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Dirección
+                  </Label>
                   <Input
                     id="direccion"
                     value={formData.direccion}
@@ -208,10 +224,13 @@ export default function PropiedadesPage() {
                       setFormData({ ...formData, direccion: e.target.value })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="distrito">Distrito</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Distrito
+                  </Label>
                   <Input
                     id="distrito"
                     value={formData.distrito}
@@ -219,90 +238,130 @@ export default function PropiedadesPage() {
                       setFormData({ ...formData, distrito: e.target.value })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="descripcion">Descripción</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Descripción
+                  </Label>
                   <Textarea
                     id="descripcion"
                     value={formData.descripcion}
                     onChange={(e) =>
                       setFormData({ ...formData, descripcion: e.target.value })
                     }
+                    className="rounded-lg mt-1"
                   />
                 </div>
               </div>
-              <DialogFooter className="mt-6">
+              <DialogFooter className="mt-6 gap-2">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setOpen(false)}
+                  className="rounded-lg"
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">Guardar</Button>
+                <Button
+                  type="submit"
+                  className="bg-[hsl(4,100%,70%)] text-white hover:bg-[hsl(4,100%,62%)] rounded-lg font-bold uppercase tracking-wider"
+                >
+                  Guardar
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
+      {/* Content */}
       {isLoading ? (
-        <div className="text-center py-8">Cargando propiedades...</div>
+        <div className="text-center py-8 text-muted-foreground">
+          Cargando propiedades...
+        </div>
       ) : propiedades.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center">
-            <Building2 className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-2 text-lg font-semibold">
+        <Card className="border-0 shadow-sm">
+          <CardContent className="py-12 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(229,29%,20%)]">
+              <Building2 className="h-8 w-8 text-white" />
+            </div>
+            <h3 className="mt-4 text-base font-bold uppercase tracking-wide">
               No hay propiedades registradas
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               Comienza agregando tu primera propiedad
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {propiedades.map((propiedad) => (
-            <Card key={propiedad.id}>
-              <CardHeader>
-                <CardTitle className="flex items-start justify-between">
-                  <span>{propiedad.nombre}</span>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => router.push(`/dashboard/propiedades/${propiedad.id}`)}
-                      title="Ver inmuebles"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(propiedad)}
-                      title="Editar"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(propiedad.id!)}
-                      title="Eliminar"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+            <Card
+              key={propiedad.id}
+              className="overflow-hidden border-0 shadow-sm hover:shadow-md transition-shadow"
+            >
+              {/* Card header: dark navy */}
+              <CardHeader
+                className="px-4 py-3 flex flex-row items-center justify-between space-y-0"
+                style={{ background: NAV_BG }}
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[hsl(4,100%,70%)]">
+                    <Building2 className="h-4 w-4 text-white" />
                   </div>
-                </CardTitle>
-                <CardDescription>{propiedad.distrito}</CardDescription>
+                  <CardTitle className="text-sm font-bold uppercase tracking-wider text-white truncate">
+                    {propiedad.nombre}
+                  </CardTitle>
+                </div>
+                {/* Action buttons over dark bg */}
+                <div className="flex shrink-0 gap-1 ml-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/15 rounded-md"
+                    onClick={() =>
+                      router.push(`/dashboard/propiedades/${propiedad.id}`)
+                    }
+                    title="Ver inmuebles"
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/15 rounded-md"
+                    onClick={() => handleEdit(propiedad)}
+                    title="Editar"
+                  >
+                    <Edit className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-white/70 hover:text-[hsl(4,100%,70%)] hover:bg-white/15 rounded-md"
+                    onClick={() => handleDelete(propiedad.id!)}
+                    title="Eliminar"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-2">
-                  {propiedad.direccion}
-                </p>
+
+              {/* Card body: white */}
+              <CardContent className="bg-white px-4 pt-3 pb-4 space-y-1">
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <MapPin className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">{propiedad.direccion}</span>
+                </div>
+                <div className="text-xs font-semibold text-[hsl(131,44%,48%)] uppercase tracking-wide">
+                  {propiedad.distrito}
+                </div>
                 {propiedad.descripcion && (
-                  <p className="text-sm">{propiedad.descripcion}</p>
+                  <p className="text-sm text-foreground/70 pt-1 line-clamp-2">
+                    {propiedad.descripcion}
+                  </p>
                 )}
               </CardContent>
             </Card>

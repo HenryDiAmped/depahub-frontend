@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -28,7 +27,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, BarChart3, TrendingUp, TrendingDown } from "lucide-react";
+import { Plus, BarChart3, TrendingUp, TrendingDown, Calendar } from "lucide-react";
 import { balancesApi, ingresosApi, egresosApi, administradoresApi } from "@/lib/api";
 import type { BalanceMensual, Ingreso, Egreso } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
@@ -150,11 +149,9 @@ export default function BalancesPage() {
 
       await ingresosApi.create(ingresoData);
 
-      // Recalcular totales del balance
       const nuevosIngresos = await ingresosApi.getAll(selectedBalance.id);
       const totalIngresos = nuevosIngresos.reduce((sum, ing) => sum + ing.importe, 0);
       
-      // Actualizar el balance con el nuevo total de ingresos
       const utilidad = totalIngresos - selectedBalance.totalEgresos;
       const balanceActualizado = await balancesApi.update(selectedBalance.id, {
         ...selectedBalance,
@@ -162,11 +159,9 @@ export default function BalancesPage() {
         utilidad,
       });
 
-      // Recalcular la utilidad total del administrador
       const todosLosBalances = await balancesApi.getAll(admin.id);
       const utilidadTotal = todosLosBalances.reduce((sum, bal) => sum + (bal.utilidad || 0), 0);
       
-      // Actualizar la utilidad total del administrador
       await administradoresApi.update(admin.id, {
         ...admin,
         utilidadTotal,
@@ -174,16 +169,14 @@ export default function BalancesPage() {
 
       toast({
         title: "Ingreso registrado",
-        description: "El ingreso se registró y el balance se actualizó correctamente",
+        description: "El ingreso se registró y el balance se actualizó",
       });
 
       setOpenIngreso(false);
       setIngresoForm({ importe: "", concepto: "", fecha: "" });
       
-      // Actualizar el balance seleccionado para reflejar los cambios en la vista
       setSelectedBalance(balanceActualizado);
       
-      // Refrescar la lista de balances y el detalle
       await fetchBalances();
       await fetchDetalleBalance(selectedBalance.id);
     } catch (error) {
@@ -209,11 +202,9 @@ export default function BalancesPage() {
 
       await egresosApi.create(egresoData);
 
-      // Recalcular totales del balance
       const nuevosEgresos = await egresosApi.getAll(selectedBalance.id);
       const totalEgresos = nuevosEgresos.reduce((sum, egr) => sum + egr.importe, 0);
       
-      // Actualizar el balance con el nuevo total de egresos
       const utilidad = selectedBalance.totalIngresos - totalEgresos;
       const balanceActualizado = await balancesApi.update(selectedBalance.id, {
         ...selectedBalance,
@@ -221,11 +212,9 @@ export default function BalancesPage() {
         utilidad,
       });
 
-      // Recalcular la utilidad total del administrador
       const todosLosBalances = await balancesApi.getAll(admin.id);
       const utilidadTotal = todosLosBalances.reduce((sum, bal) => sum + (bal.utilidad || 0), 0);
       
-      // Actualizar la utilidad total del administrador
       await administradoresApi.update(admin.id, {
         ...admin,
         utilidadTotal,
@@ -233,16 +222,14 @@ export default function BalancesPage() {
 
       toast({
         title: "Egreso registrado",
-        description: "El egreso se registró y el balance se actualizó correctamente",
+        description: "El egreso se registró y el balance se actualizó",
       });
 
       setOpenEgreso(false);
       setEgresoForm({ importe: "", concepto: "", fecha: "" });
       
-      // Actualizar el balance seleccionado para reflejar los cambios en la vista
       setSelectedBalance(balanceActualizado);
       
-      // Refrescar la lista de balances y el detalle
       await fetchBalances();
       await fetchDetalleBalance(selectedBalance.id);
     } catch (error) {
@@ -261,29 +248,32 @@ export default function BalancesPage() {
 
   return (
     <div className="space-y-6">
+      {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Balances Mensuales</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-bold uppercase tracking-wide text-foreground">
+            Balances Mensuales
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             Gestiona los balances financieros
           </p>
         </div>
         <Dialog open={openBalance} onOpenChange={setOpenBalance}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="bg-[hsl(4,100%,70%)] text-white font-bold uppercase tracking-wider hover:bg-[hsl(4,100%,62%)] shadow-md rounded-lg">
               <Plus className="mr-2 h-4 w-4" />
               Nuevo Balance
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-md rounded-2xl">
             <DialogHeader>
-              <DialogTitle>Nuevo Balance Mensual</DialogTitle>
+              <DialogTitle className="font-bold uppercase tracking-wide">Nuevo Balance Mensual</DialogTitle>
               <DialogDescription>Selecciona mes y año</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleCreateBalance}>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="mes">Mes</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">Mes</Label>
                   <Select
                     value={balanceForm.mes}
                     onValueChange={(value) =>
@@ -291,7 +281,7 @@ export default function BalancesPage() {
                     }
                     required
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-10 rounded-lg mt-1">
                       <SelectValue placeholder="Seleccionar mes" />
                     </SelectTrigger>
                     <SelectContent>
@@ -304,7 +294,7 @@ export default function BalancesPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="anio">Año</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">Año</Label>
                   <Input
                     id="anio"
                     type="number"
@@ -314,11 +304,22 @@ export default function BalancesPage() {
                     }
                     placeholder="2026"
                     required
+                    className="h-10 rounded-lg mt-1"
                   />
                 </div>
               </div>
-              <DialogFooter className="mt-6">
-                <Button type="submit">Crear Balance</Button>
+              <DialogFooter className="mt-6 gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setOpenBalance(false)}
+                  className="rounded-lg"
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit" className="bg-[hsl(4,100%,70%)] text-white hover:bg-[hsl(4,100%,62%)] rounded-lg font-bold uppercase tracking-wider">
+                  Crear Balance
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -326,179 +327,192 @@ export default function BalancesPage() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8">Cargando balances...</div>
+        <div className="text-center py-8 text-muted-foreground">Cargando balances...</div>
       ) : balances.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center">
-            <BarChart3 className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-2 text-lg font-semibold">
+        <Card className="border-0 shadow-sm">
+          <CardContent className="py-12 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(229,29%,20%)]">
+              <BarChart3 className="h-8 w-8 text-white" />
+            </div>
+            <h3 className="mt-4 text-base font-bold uppercase tracking-wide">
               No hay balances registrados
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               Crea tu primer balance mensual
             </p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-6 lg:grid-cols-3">
-          <Card className="lg:col-span-1">
-            <CardHeader>
-              <CardTitle>Períodos</CardTitle>
-              <CardDescription>Selecciona un balance</CardDescription>
+          {/* Períodos Sidebar */}
+          <Card className="lg:col-span-1 overflow-hidden border-0 shadow-sm h-fit">
+            <CardHeader className="bg-[hsl(229,29%,20%)] px-4 py-3">
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[hsl(220,20%,75%)]">
+                Períodos
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {balances.map((balance) => (
-                  <Button
-                    key={balance.id}
-                    variant={
-                      selectedBalance?.id === balance.id ? "default" : "outline"
-                    }
-                    className="w-full justify-start"
-                    onClick={() => handleSelectBalance(balance)}
-                  >
-                    {meses[balance.mes - 1]} {balance.anio}
-                  </Button>
-                ))}
+            <CardContent className="bg-white p-3">
+              <div className="space-y-1">
+                {balances.map((balance) => {
+                  const isSelected = selectedBalance?.id === balance.id;
+                  return (
+                    <Button
+                      key={balance.id}
+                      variant="ghost"
+                      className={`w-full justify-start rounded-lg font-medium transition-colors ${
+                        isSelected 
+                          ? "bg-[hsl(4,100%,70%)] text-white hover:bg-[hsl(4,100%,70%)] hover:text-white" 
+                          : "text-foreground hover:bg-[hsl(220,20%,95%)]"
+                      }`}
+                      onClick={() => handleSelectBalance(balance)}
+                    >
+                      <Calendar className={`mr-2 h-4 w-4 ${isSelected ? "text-white" : "text-muted-foreground"}`} />
+                      {meses[balance.mes - 1]} {balance.anio}
+                    </Button>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
 
+          {/* Balance Details */}
           {selectedBalance && (
             <div className="lg:col-span-2 space-y-6">
-              <div className="grid gap-6 md:grid-cols-3">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
+              {/* Stat Cards */}
+              <div className="grid gap-4 md:grid-cols-3">
+                <Card className="overflow-hidden border-0 shadow-sm">
+                  <CardHeader className="bg-[hsl(229,29%,20%)] px-4 py-3 flex flex-row items-center justify-between space-y-0">
+                    <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[hsl(220,20%,75%)]">
                       Total Ingresos
                     </CardTitle>
-                    <TrendingUp className="h-4 w-4 text-green-600" />
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[hsl(131,44%,62%)]">
+                      <TrendingUp className="h-3 w-3 text-white" />
+                    </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-green-600">
+                  <CardContent className="bg-white px-4 pt-4 pb-5">
+                    <div className="text-2xl font-bold text-[hsl(131,44%,45%)]">
                       S/. {selectedBalance.totalIngresos.toFixed(2)}
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
+                <Card className="overflow-hidden border-0 shadow-sm">
+                  <CardHeader className="bg-[hsl(229,29%,20%)] px-4 py-3 flex flex-row items-center justify-between space-y-0">
+                    <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[hsl(220,20%,75%)]">
                       Total Egresos
                     </CardTitle>
-                    <TrendingDown className="h-4 w-4 text-red-600" />
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[hsl(4,100%,70%)]">
+                      <TrendingDown className="h-3 w-3 text-white" />
+                    </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-red-600">
+                  <CardContent className="bg-white px-4 pt-4 pb-5">
+                    <div className="text-2xl font-bold text-[hsl(4,100%,62%)]">
                       S/. {selectedBalance.totalEgresos.toFixed(2)}
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
+                <Card className="overflow-hidden border-0 shadow-sm">
+                  <CardHeader className="bg-[hsl(229,29%,20%)] px-4 py-3 flex flex-row items-center justify-between space-y-0">
+                    <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[hsl(220,20%,75%)]">
                       Utilidad
                     </CardTitle>
-                    <BarChart3 className="h-4 w-4" />
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[hsl(229,29%,35%)]">
+                      <BarChart3 className="h-3 w-3 text-white" />
+                    </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
+                  <CardContent className="bg-white px-4 pt-4 pb-5">
+                    <div className="text-2xl font-bold text-foreground">
                       S/. {(selectedBalance.utilidad || 0).toFixed(2)}
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
+              {/* Lists */}
               <div className="grid gap-6 md:grid-cols-2">
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle>Ingresos</CardTitle>
-                      <Dialog open={openIngreso} onOpenChange={setOpenIngreso}>
-                        <DialogTrigger asChild>
-                          <Button size="sm" variant="outline">
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Registrar Ingreso</DialogTitle>
-                          </DialogHeader>
-                          <form onSubmit={handleCreateIngreso}>
-                            <div className="space-y-4">
-                              <div>
-                                <Label>Importe (S/.)</Label>
-                                <Input
-                                  type="number"
-                                  step="0.01"
-                                  value={ingresoForm.importe}
-                                  onChange={(e) =>
-                                    setIngresoForm({
-                                      ...ingresoForm,
-                                      importe: e.target.value,
-                                    })
-                                  }
-                                  required
-                                />
-                              </div>
-
-                              <div>
-                                <Label>Concepto</Label>
-                                <Input
-                                  value={ingresoForm.concepto}
-                                  onChange={(e) =>
-                                    setIngresoForm({
-                                      ...ingresoForm,
-                                      concepto: e.target.value,
-                                    })
-                                  }
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <Label>Fecha</Label>
-                                <Input
-                                  type="date"
-                                  value={ingresoForm.fecha}
-                                  onChange={(e) =>
-                                    setIngresoForm({
-                                      ...ingresoForm,
-                                      fecha: e.target.value,
-                                    })
-                                  }
-                                  required
-                                />
-                              </div>
+                {/* Ingresos List */}
+                <Card className="overflow-hidden border-0 shadow-sm">
+                  <CardHeader className="bg-[hsl(229,29%,20%)] px-4 py-3 flex flex-row items-center justify-between space-y-0">
+                    <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[hsl(220,20%,75%)]">
+                      Ingresos
+                    </CardTitle>
+                    <Dialog open={openIngreso} onOpenChange={setOpenIngreso}>
+                      <DialogTrigger asChild>
+                        <Button size="sm" className="h-7 px-2 rounded bg-white/10 hover:bg-white/20 text-white border-0">
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md rounded-2xl">
+                        <DialogHeader>
+                          <DialogTitle className="font-bold uppercase tracking-wide">Registrar Ingreso</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleCreateIngreso}>
+                          <div className="space-y-4">
+                            <div>
+                              <Label className="text-xs font-semibold uppercase tracking-wider">Importe (S/.)</Label>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                value={ingresoForm.importe}
+                                onChange={(e) =>
+                                  setIngresoForm({ ...ingresoForm, importe: e.target.value })
+                                }
+                                required
+                                className="h-10 rounded-lg mt-1"
+                              />
                             </div>
-                            <DialogFooter className="mt-6">
-                              <Button type="submit">Registrar</Button>
-                            </DialogFooter>
-                          </form>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
+                            <div>
+                              <Label className="text-xs font-semibold uppercase tracking-wider">Concepto</Label>
+                              <Input
+                                value={ingresoForm.concepto}
+                                onChange={(e) =>
+                                  setIngresoForm({ ...ingresoForm, concepto: e.target.value })
+                                }
+                                required
+                                className="h-10 rounded-lg mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs font-semibold uppercase tracking-wider">Fecha</Label>
+                              <Input
+                                type="date"
+                                value={ingresoForm.fecha}
+                                onChange={(e) =>
+                                  setIngresoForm({ ...ingresoForm, fecha: e.target.value })
+                                }
+                                required
+                                className="h-10 rounded-lg mt-1"
+                              />
+                            </div>
+                          </div>
+                          <DialogFooter className="mt-6 gap-2">
+                            <Button type="button" variant="outline" onClick={() => setOpenIngreso(false)} className="rounded-lg">
+                              Cancelar
+                            </Button>
+                            <Button type="submit" className="bg-[hsl(4,100%,70%)] text-white hover:bg-[hsl(4,100%,62%)] rounded-lg font-bold uppercase tracking-wider">
+                              Registrar
+                            </Button>
+                          </DialogFooter>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
+                  <CardContent className="bg-white p-0">
+                    <div className="divide-y divide-border">
                       {ingresos.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground p-4 text-center">
                           No hay ingresos registrados
                         </p>
                       ) : (
                         ingresos.map((ingreso) => (
-                          <div
-                            key={ingreso.id}
-                            className="flex justify-between text-sm border-b pb-2"
-                          >
+                          <div key={ingreso.id} className="flex justify-between items-center px-4 py-3 hover:bg-[hsl(220,20%,98%)]">
                             <div>
-                              <p className="font-medium">{ingreso.concepto}</p>
-                              <p className="text-muted-foreground">
-                                {ingreso.fecha}
-                              </p>
+                              <p className="text-sm font-semibold text-foreground">{ingreso.concepto}</p>
+                              <p className="text-xs text-muted-foreground">{ingreso.fecha}</p>
                             </div>
-                            <p className="font-bold text-green-600">
-                              S/. {ingreso.importe.toFixed(2)}
+                            <p className="text-sm font-bold text-[hsl(131,44%,45%)]">
+                              + S/. {ingreso.importe.toFixed(2)}
                             </p>
                           </div>
                         ))
@@ -507,94 +521,88 @@ export default function BalancesPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle>Egresos</CardTitle>
-                      <Dialog open={openEgreso} onOpenChange={setOpenEgreso}>
-                        <DialogTrigger asChild>
-                          <Button size="sm" variant="outline">
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Registrar Egreso</DialogTitle>
-                          </DialogHeader>
-                          <form onSubmit={handleCreateEgreso}>
-                            <div className="space-y-4">
-                              <div>
-                                <Label>Importe (S/.)</Label>
-                                <Input
-                                  type="number"
-                                  step="0.01"
-                                  value={egresoForm.importe}
-                                  onChange={(e) =>
-                                    setEgresoForm({
-                                      ...egresoForm,
-                                      importe: e.target.value,
-                                    })
-                                  }
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <Label>Concepto</Label>
-                                <Input
-                                  value={egresoForm.concepto}
-                                  onChange={(e) =>
-                                    setEgresoForm({
-                                      ...egresoForm,
-                                      concepto: e.target.value,
-                                    })
-                                  }
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <Label>Fecha</Label>
-                                <Input
-                                  type="date"
-                                  value={egresoForm.fecha}
-                                  onChange={(e) =>
-                                    setEgresoForm({
-                                      ...egresoForm,
-                                      fecha: e.target.value,
-                                    })
-                                  }
-                                  required
-                                />
-                              </div>
+                {/* Egresos List */}
+                <Card className="overflow-hidden border-0 shadow-sm">
+                  <CardHeader className="bg-[hsl(229,29%,20%)] px-4 py-3 flex flex-row items-center justify-between space-y-0">
+                    <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[hsl(220,20%,75%)]">
+                      Egresos
+                    </CardTitle>
+                    <Dialog open={openEgreso} onOpenChange={setOpenEgreso}>
+                      <DialogTrigger asChild>
+                        <Button size="sm" className="h-7 px-2 rounded bg-white/10 hover:bg-white/20 text-white border-0">
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md rounded-2xl">
+                        <DialogHeader>
+                          <DialogTitle className="font-bold uppercase tracking-wide">Registrar Egreso</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleCreateEgreso}>
+                          <div className="space-y-4">
+                            <div>
+                              <Label className="text-xs font-semibold uppercase tracking-wider">Importe (S/.)</Label>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                value={egresoForm.importe}
+                                onChange={(e) =>
+                                  setEgresoForm({ ...egresoForm, importe: e.target.value })
+                                }
+                                required
+                                className="h-10 rounded-lg mt-1"
+                              />
                             </div>
-                            <DialogFooter className="mt-6">
-                              <Button type="submit">Registrar</Button>
-                            </DialogFooter>
-                          </form>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
+                            <div>
+                              <Label className="text-xs font-semibold uppercase tracking-wider">Concepto</Label>
+                              <Input
+                                value={egresoForm.concepto}
+                                onChange={(e) =>
+                                  setEgresoForm({ ...egresoForm, concepto: e.target.value })
+                                }
+                                required
+                                className="h-10 rounded-lg mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs font-semibold uppercase tracking-wider">Fecha</Label>
+                              <Input
+                                type="date"
+                                value={egresoForm.fecha}
+                                onChange={(e) =>
+                                  setEgresoForm({ ...egresoForm, fecha: e.target.value })
+                                }
+                                required
+                                className="h-10 rounded-lg mt-1"
+                              />
+                            </div>
+                          </div>
+                          <DialogFooter className="mt-6 gap-2">
+                            <Button type="button" variant="outline" onClick={() => setOpenEgreso(false)} className="rounded-lg">
+                              Cancelar
+                            </Button>
+                            <Button type="submit" className="bg-[hsl(4,100%,70%)] text-white hover:bg-[hsl(4,100%,62%)] rounded-lg font-bold uppercase tracking-wider">
+                              Registrar
+                            </Button>
+                          </DialogFooter>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
                   </CardHeader>
-
-                  <CardContent>
-                    <div className="space-y-2">
+                  <CardContent className="bg-white p-0">
+                    <div className="divide-y divide-border">
                       {egresos.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground p-4 text-center">
                           No hay egresos registrados
                         </p>
                       ) : (
                         egresos.map((egreso) => (
-                          <div
-                            key={egreso.id}
-                            className="flex justify-between text-sm border-b pb-2"
-                          >
+                          <div key={egreso.id} className="flex justify-between items-center px-4 py-3 hover:bg-[hsl(220,20%,98%)]">
                             <div>
-                              <p className="font-medium">{egreso.concepto}</p>
-                              <p className="text-muted-foreground">
-                                {egreso.fecha}
-                              </p>
+                              <p className="text-sm font-semibold text-foreground">{egreso.concepto}</p>
+                              <p className="text-xs text-muted-foreground">{egreso.fecha}</p>
                             </div>
-                            <p className="font-bold text-red-600">
-                              S/. {egreso.importe.toFixed(2)}
+                            <p className="text-sm font-bold text-[hsl(4,100%,62%)]">
+                              - S/. {egreso.importe.toFixed(2)}
                             </p>
                           </div>
                         ))

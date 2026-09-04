@@ -21,9 +21,9 @@ export default function DashboardLayout({
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">Cargando...</h1>
+          <h1 className="text-2xl font-bold text-foreground">Cargando...</h1>
         </div>
       </div>
     );
