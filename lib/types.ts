@@ -33,6 +33,7 @@ export interface Inmueble {
   descripcion: string;
   propiedad?: {
     id: number;
+    nombre?: string;
     administrador?: { id: number };
   };
 }
@@ -51,6 +52,7 @@ export interface Inquilino {
     id: number;
     propiedad?: {
       id: number;
+      nombre?: string;
       administrador?: { id: number };
     };
   };

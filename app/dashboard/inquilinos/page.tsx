@@ -222,7 +222,11 @@ export default function InquilinosPage() {
     setEditingInquilino(null);
   };
 
-  const inmueblesDisponibles = inmuebles.filter((i) => i.estado === "DISPONIBLE");
+  const inmueblesParaSeleccion = inmuebles.filter(
+    (inmueble) =>
+      inmueble.estado === "DISPONIBLE" ||
+      inmueble.id === editingInquilino?.inmueble?.id
+  );
 
   return (
     <div className="space-y-6">
@@ -321,12 +325,17 @@ export default function InquilinosPage() {
                       <SelectValue placeholder="Seleccionar inmueble" />
                     </SelectTrigger>
                     <SelectContent>
-                      {inmueblesDisponibles.map((inmueble) => (
+                      {inmueblesParaSeleccion.map((inmueble) => (
                         <SelectItem
                           key={inmueble.id}
                           value={inmueble.id!.toString()}
                         >
-                          {inmueble.nombre}
+                          <span className="flex w-full items-center justify-between gap-6">
+                            <span>{inmueble.nombre}</span>
+                            <span className="text-muted-foreground">
+                              {inmueble.propiedad?.nombre ?? "Sin propiedad"}
+                            </span>
+                          </span>
                         </SelectItem>
                       ))}
                     </SelectContent>
