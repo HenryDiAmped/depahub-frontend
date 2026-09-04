@@ -31,7 +31,10 @@ export interface Inmueble {
   precioBase: number;
   estado: EstadoInmueble;
   descripcion: string;
-  propiedad?: { id: number };
+  propiedad?: {
+    id: number;
+    administrador?: { id: number };
+  };
 }
 
 export type EstadoInquilino = 'ACTIVO' | 'RETIRADO';
@@ -44,7 +47,13 @@ export interface Inquilino {
   email?: string; // Email es opcional
   fechaNacimiento: string;
   estado: EstadoInquilino;
-  inmueble?: { id: number };
+  inmueble?: {
+    id: number;
+    propiedad?: {
+      id: number;
+      administrador?: { id: number };
+    };
+  };
 }
 
 export type EstadoContrato = 'ACTIVO' | 'FINALIZADO' | 'CANCELADO';

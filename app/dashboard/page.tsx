@@ -37,10 +37,22 @@ export default function DashboardPage() {
             balancesApi.getAll(admin.id),
           ]);
 
+        // Los endpoints devuelven registros de todos los administradores. La
+        // pertenencia se identifica por la propiedad anidada en cada respuesta.
+        const inmueblesDelAdministrador = inmuebles.filter(
+          (inmueble) => inmueble.propiedad?.administrador?.id === admin.id
+        );
+        const inquilinosDelAdministrador = inquilinos.filter(
+          (inquilino) =>
+            inquilino.inmueble?.propiedad?.administrador?.id === admin.id
+        );
+
         setStats({
           propiedades: propiedades.length,
-          inmuebles: inmuebles.length,
-          inquilinos: inquilinos.filter((i) => i.estado === "ACTIVO").length,
+          inmuebles: inmueblesDelAdministrador.length,
+          inquilinos: inquilinosDelAdministrador.filter(
+            (inquilino) => inquilino.estado === "ACTIVO"
+          ).length,
           contratos: contratos.filter((c) => c.estado === "ACTIVO").length,
         });
 
