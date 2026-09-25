@@ -25,6 +25,12 @@ Content-Type: application/json
 
 ## Autenticación
 
+Todas las rutas, excepto `/auth/register` y `/auth/login`, requieren un JWT válido:
+
+```
+Authorization: Bearer <token>
+```
+
 | Método | Ruta | Descripción |
 | --- | --- | --- |
 | `POST` | `/auth/register` | Registra un administrador e inicia su sesión. |
@@ -62,6 +68,7 @@ Respuesta esperada para ambas rutas:
 ```json
 {
   "mensaje": "Operación exitosa",
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
   "administrador": {
     "id": 1,
     "nombreCompleto": "Ana Pérez",
