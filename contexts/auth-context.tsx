@@ -22,10 +22,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Recuperar admin del localStorage al cargar
+    // Recuperar la sesión únicamente si también existe su token JWT.
     const storedAdmin = localStorage.getItem("admin");
-    if (storedAdmin) {
+    const token = localStorage.getItem("authToken");
+    if (storedAdmin && token) {
       setAdmin(JSON.parse(storedAdmin));
+    } else {
+      localStorage.removeItem("admin");
+      localStorage.removeItem("authToken");
     }
     setIsLoading(false);
   }, []);
@@ -37,6 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       setAdmin(adminData);
       localStorage.setItem("admin", JSON.stringify(adminData));
+      localStorage.setItem("authToken", response.token);
       
       toast({
         title: "Inicio de sesión exitoso",
@@ -62,6 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       setAdmin(adminData);
       localStorage.setItem("admin", JSON.stringify(adminData));
+      localStorage.setItem("authToken", response.token);
       
       toast({
         title: "Registro exitoso",
@@ -83,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setAdmin(null);
     localStorage.removeItem("admin");
+    localStorage.removeItem("authToken");
     router.push("/login");
     
     toast({

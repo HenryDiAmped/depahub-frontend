@@ -121,11 +121,13 @@ export interface Egreso {
 
 export interface LoginResponse {
   mensaje: string;
+  token: string;
   administrador: Administrador;
 }
 
 export interface RegisterResponse {
   mensaje: string;
+  token: string;
   administrador: Administrador;
 }
 
