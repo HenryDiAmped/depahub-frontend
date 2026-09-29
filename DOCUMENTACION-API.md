@@ -212,9 +212,14 @@ inquilino.inmueble.propiedad.administrador.id
 | `GET` | `/contratos?inquilinoId={id}` | Lista contratos de un inquilino. |
 | `GET` | `/contratos?administradorId={id}&inquilinoId={id}` | Aplica ambos filtros. |
 | `GET` | `/contratos/{id}` | Obtiene un contrato. |
+| `GET` | `/contratos/{id}/pdf` | Genera y devuelve el contrato en PDF. |
 | `POST` | `/contratos` | Crea un contrato. |
 | `PUT` | `/contratos/{id}` | Actualiza un contrato. |
 | `DELETE` | `/contratos/{id}` | Elimina un contrato. |
+
+La respuesta de `GET /contratos/{id}/pdf` es binaria (`application/pdf`) y
+requiere el encabezado `Authorization: Bearer <token>`. Solo el administrador
+titular del contrato puede obtenerlo.
 
 ```json
 {

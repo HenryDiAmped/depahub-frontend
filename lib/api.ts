@@ -79,6 +79,29 @@ async function fetchApi<T>(
   }
 }
 
+async function fetchPdf(endpoint: string): Promise<Blob> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
+    headers: {
+      Accept: 'application/pdf',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    let message = `Error: ${response.status}`;
+    try {
+      const error = await response.json();
+      message = error.message || error.error || message;
+    } catch {
+      // Mantener el mensaje basado en el código HTTP si la respuesta no es JSON.
+    }
+    throw new Error(message);
+  }
+
+  return response.blob();
+}
+
 // ============================================
 // AUTH
 // ============================================
@@ -222,6 +245,7 @@ export const contratosApi = {
     }),
   delete: (id: number) =>
     fetchApi<void>(`/contratos/${id}`, { method: 'DELETE' }),
+  obtenerPdf: (id: number) => fetchPdf(`/contratos/${id}/pdf`),
 };
 
 // ============================================
