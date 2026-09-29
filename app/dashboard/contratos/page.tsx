@@ -28,7 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, FileText, CalendarDays, DollarSign } from "lucide-react";
+import { Plus, FileText, CalendarDays, Download, Eye } from "lucide-react";
 import { contratosApi, inquilinosApi } from "@/lib/api";
 import type { Contrato, Inquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
@@ -39,6 +39,10 @@ export default function ContratosPage() {
   const [inquilinos, setInquilinos] = useState<Inquilino[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [contratoPdf, setContratoPdf] = useState<Contrato | null>(null);
+  const [pdfOpen, setPdfOpen] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     fechaInicio: "",
     fechaFin: "",
@@ -106,7 +110,7 @@ export default function ContratosPage() {
 
       setOpen(false);
       resetForm();
-      fetchData();
+      await fetchData();
     } catch (error) {
       toast({
         variant: "destructive",
@@ -142,6 +146,36 @@ export default function ContratosPage() {
         garantia: precioBase.toString(),
       }),
     }));
+  };
+
+  const handleVerPdf = async (contrato: Contrato) => {
+    if (!contrato.id) return;
+
+    setIsGeneratingPdf(contrato.id);
+    try {
+      const pdf = await contratosApi.obtenerPdf(contrato.id);
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+      setPdfUrl(URL.createObjectURL(pdf));
+      setContratoPdf(contrato);
+      setPdfOpen(true);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "No se pudo generar el PDF",
+        description: error instanceof Error ? error.message : "Intenta nuevamente",
+      });
+    } finally {
+      setIsGeneratingPdf(null);
+    }
+  };
+
+  const handlePdfDialogChange = (isOpen: boolean) => {
+    setPdfOpen(isOpen);
+    if (!isOpen && pdfUrl) {
+      URL.revokeObjectURL(pdfUrl);
+      setPdfUrl(null);
+      setContratoPdf(null);
+    }
   };
 
   // Helpers de estado
@@ -386,11 +420,51 @@ export default function ContratosPage() {
                     {contrato.condiciones}
                   </p>
                 )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mt-2 w-full rounded-lg"
+                  onClick={() => handleVerPdf(contrato)}
+                  disabled={isGeneratingPdf === contrato.id}
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  {isGeneratingPdf === contrato.id ? "Generando PDF..." : "Ver y descargar PDF"}
+                </Button>
               </CardContent>
             </Card>
           ))}
         </div>
       )}
+
+      <Dialog open={pdfOpen} onOpenChange={handlePdfDialogChange}>
+        <DialogContent className="flex h-[88vh] max-w-5xl flex-col rounded-2xl p-0">
+          <DialogHeader className="border-b px-6 py-4">
+            <DialogTitle className="font-bold uppercase tracking-wide">
+              Contrato #{contratoPdf?.id}
+            </DialogTitle>
+            <DialogDescription>
+              Vista previa del contrato generado con los datos registrados.
+            </DialogDescription>
+          </DialogHeader>
+          {pdfUrl && (
+            <iframe
+              src={pdfUrl}
+              title={`Contrato ${contratoPdf?.id}`}
+              className="min-h-0 flex-1 border-0"
+            />
+          )}
+          <DialogFooter className="border-t px-6 py-4">
+            {pdfUrl && contratoPdf?.id && (
+              <a href={pdfUrl} download={`contrato-${contratoPdf.id}.pdf`}>
+                <Button className="bg-[hsl(4,100%,70%)] text-white hover:bg-[hsl(4,100%,62%)]">
+                  <Download className="mr-2 h-4 w-4" />
+                  Descargar PDF
+                </Button>
+              </a>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
