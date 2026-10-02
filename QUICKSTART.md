@@ -1,4 +1,4 @@
-# 🚀 Guía de Inicio Rápido - DepaHub Frontend
+# 🚀 Guía para Inicio Rápido - DepaHub Frontend
 
 ## Prerrequisitos
 

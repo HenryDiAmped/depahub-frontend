@@ -2,7 +2,7 @@
 
 ## ✅ Estado del Proyecto: COMPLETADO
 
-### 🎯 Objetivo
+### 🎯 Objetivo del proyecto
 Desarrollar el frontend completo del sistema de gestión de alquileres DepaHub, consumiendo la API REST disponible en `localhost:8080`.
 
 ---

@@ -2,7 +2,7 @@
 
 ## [1.0.7] - 2026-07-02
 
-### ✨ Actualización Automática de Vista y Utilidad Total
+### ✨ Actualización Automática de Vista y La Utilidad Total
 
 #### 1. Actualización automática de la vista en Balances
 - **Mejora**: Al registrar un ingreso o egreso, la vista se actualiza automáticamente sin necesidad de refrescar manualmente.
