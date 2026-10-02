@@ -67,6 +67,8 @@ export interface Contrato {
   fechaFin: string;
   montoAlquiler: number;
   garantia: number;
+  frecuencia: number;
+  numeroCuotas: number;
   estado: EstadoContrato;
   condiciones: string;
   fechaRegistro: string;

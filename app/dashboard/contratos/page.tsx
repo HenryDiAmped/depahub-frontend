@@ -33,6 +33,52 @@ import { contratosApi, inquilinosApi } from "@/lib/api";
 import type { Contrato, Inquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 
+type PlanCuotas = {
+  cuotasCompletas: number;
+  tieneProrrateo: boolean;
+  numeroCuotas: number;
+};
+
+function fechaLocal(valor: string) {
+  const [anio, mes, dia] = valor.split("-").map(Number);
+  return new Date(anio, mes - 1, dia);
+}
+
+function sumarMeses(fecha: Date, meses: number) {
+  const mesDestino = fecha.getMonth() + meses;
+  const anioDestino = fecha.getFullYear() + Math.floor(mesDestino / 12);
+  const mesNormalizado = ((mesDestino % 12) + 12) % 12;
+  const ultimoDia = new Date(anioDestino, mesNormalizado + 1, 0).getDate();
+  return new Date(anioDestino, mesNormalizado, Math.min(fecha.getDate(), ultimoDia));
+}
+
+function calcularPlanCuotas(fechaInicio: string, fechaFin: string, frecuencia: number): PlanCuotas | null {
+  if (!fechaInicio || !fechaFin || frecuencia <= 0) return null;
+
+  const fin = fechaLocal(fechaFin);
+  let inicioPeriodo = fechaLocal(fechaInicio);
+  if (Number.isNaN(fin.getTime()) || Number.isNaN(inicioPeriodo.getTime()) || fin < inicioPeriodo) {
+    return null;
+  }
+
+  let cuotasCompletas = 0;
+  while (true) {
+    const siguientePeriodo = sumarMeses(inicioPeriodo, frecuencia);
+    const finPeriodo = new Date(siguientePeriodo);
+    finPeriodo.setDate(finPeriodo.getDate() - 1);
+    if (finPeriodo > fin) break;
+    cuotasCompletas++;
+    inicioPeriodo = siguientePeriodo;
+  }
+
+  const tieneProrrateo = inicioPeriodo <= fin;
+  return {
+    cuotasCompletas,
+    tieneProrrateo,
+    numeroCuotas: cuotasCompletas + (tieneProrrateo ? 1 : 0),
+  };
+}
+
 export default function ContratosPage() {
   const { admin } = useAuth();
   const [contratos, setContratos] = useState<Contrato[]>([]);
@@ -48,6 +94,8 @@ export default function ContratosPage() {
     fechaFin: "",
     montoAlquiler: "",
     garantia: "",
+    frecuencia: "",
+    frecuenciaPersonalizada: "",
     estado: "ACTIVO" as const,
     condiciones: "",
     inquilinoId: "",
@@ -88,6 +136,15 @@ export default function ContratosPage() {
     e.preventDefault();
     if (!admin?.id) return;
 
+    if (!planCuotas || !frecuenciaSeleccionada) {
+      toast({
+        variant: "destructive",
+        title: "Datos de pago incompletos",
+        description: "Selecciona fechas válidas y una frecuencia de pago.",
+      });
+      return;
+    }
+
     try {
       const today = new Date().toISOString().split("T")[0];
       const contratoData: Contrato = {
@@ -95,6 +152,8 @@ export default function ContratosPage() {
         fechaFin: formData.fechaFin,
         montoAlquiler: Number(formData.montoAlquiler),
         garantia: Number(formData.garantia),
+        frecuencia: frecuenciaSeleccionada,
+        numeroCuotas: planCuotas.numeroCuotas,
         estado: formData.estado,
         condiciones: formData.condiciones,
         fechaRegistro: today,
@@ -126,6 +185,8 @@ export default function ContratosPage() {
       fechaFin: "",
       montoAlquiler: "",
       garantia: "",
+      frecuencia: "",
+      frecuenciaPersonalizada: "",
       estado: "ACTIVO",
       condiciones: "",
       inquilinoId: "",
@@ -147,6 +208,16 @@ export default function ContratosPage() {
       }),
     }));
   };
+
+  const fechasValidas = Boolean(
+    formData.fechaInicio && formData.fechaFin && formData.fechaFin >= formData.fechaInicio
+  );
+  const frecuenciaSeleccionada = formData.frecuencia === "PERSONALIZADA"
+    ? Number(formData.frecuenciaPersonalizada)
+    : Number(formData.frecuencia);
+  const planCuotas = fechasValidas
+    ? calcularPlanCuotas(formData.fechaInicio, formData.fechaFin, frecuenciaSeleccionada)
+    : null;
 
   const handleVerPdf = async (contrato: Contrato) => {
     if (!contrato.id) return;
@@ -275,6 +346,65 @@ export default function ContratosPage() {
                     className="h-10 rounded-lg mt-1"
                   />
                 </div>
+                <div>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Frecuencia de pago
+                  </Label>
+                  <Select
+                    value={formData.frecuencia}
+                    onValueChange={(value) =>
+                      setFormData({
+                        ...formData,
+                        frecuencia: value,
+                        frecuenciaPersonalizada: value === "PERSONALIZADA" ? formData.frecuenciaPersonalizada : "",
+                      })
+                    }
+                    disabled={!fechasValidas}
+                  >
+                    <SelectTrigger className="mt-1 h-10 rounded-lg">
+                      <SelectValue placeholder={fechasValidas ? "Seleccionar frecuencia" : "Completa las fechas primero"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Mensual</SelectItem>
+                      <SelectItem value="2">Bimestral</SelectItem>
+                      <SelectItem value="3">Trimestral</SelectItem>
+                      <SelectItem value="6">Semestral</SelectItem>
+                      <SelectItem value="12">Anual</SelectItem>
+                      <SelectItem value="PERSONALIZADA">Personalizada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {formData.frecuencia === "PERSONALIZADA" && (
+                  <div>
+                    <Label className="text-xs font-semibold uppercase tracking-wider">
+                      Cada cuántos meses
+                    </Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={formData.frecuenciaPersonalizada}
+                      onChange={(event) =>
+                        setFormData({ ...formData, frecuenciaPersonalizada: event.target.value })
+                      }
+                      disabled={!fechasValidas}
+                      required
+                      className="mt-1 h-10 rounded-lg"
+                    />
+                  </div>
+                )}
+                {planCuotas && (
+                  <div className="col-span-2 rounded-lg bg-[hsl(131,44%,95%)] px-4 py-3 text-sm">
+                    <p className="font-bold text-[hsl(131,44%,40%)]">
+                      {planCuotas.numeroCuotas} cuotas en total
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {planCuotas.tieneProrrateo
+                        ? `${planCuotas.cuotasCompletas} cuotas completas + 1 cuota especial prorrateada.`
+                        : `${planCuotas.cuotasCompletas} cuotas completas.`}
+                    </p>
+                  </div>
+                )}
                 <div>
                   <Label className="text-xs font-semibold uppercase tracking-wider">
                     Monto Alquiler (S/.)
@@ -415,6 +545,9 @@ export default function ContratosPage() {
                     </p>
                   </div>
                 </div>
+                <p className="text-xs font-semibold text-[hsl(229,29%,40%)]">
+                  Pago cada {contrato.frecuencia} {contrato.frecuencia === 1 ? "mes" : "meses"} · {contrato.numeroCuotas} {contrato.numeroCuotas === 1 ? "cuota" : "cuotas"}
+                </p>
                 {contrato.condiciones && (
                   <p className="text-xs text-muted-foreground line-clamp-2 pt-1">
                     {contrato.condiciones}
