@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +36,7 @@ import { toast } from "@/hooks/use-toast";
 
 export default function InquilinosPage() {
   const { admin } = useAuth();
+  const router = useRouter();
   const [inquilinos, setInquilinos] = useState<Inquilino[]>([]);
   const [inmuebles, setInmuebles] = useState<Inmueble[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -410,7 +412,16 @@ export default function InquilinosPage() {
             return (
               <Card
                 key={inquilino.id}
-                className="overflow-hidden border-0 shadow-sm hover:shadow-md transition-shadow"
+                role="link"
+                tabIndex={0}
+                onClick={() => router.push(`/dashboard/inquilinos/${inquilino.id}`)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    router.push(`/dashboard/inquilinos/${inquilino.id}`);
+                  }
+                }}
+                className="cursor-pointer overflow-hidden border-0 shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(4,100%,70%)]"
               >
                 {/* Card header: dark navy */}
                 <CardHeader
@@ -466,7 +477,10 @@ export default function InquilinosPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleEdit(inquilino)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleEdit(inquilino);
+                      }}
                       className="rounded-lg text-xs font-semibold uppercase tracking-wider h-8"
                     >
                       <Edit className="mr-1 h-3 w-3" />
@@ -476,7 +490,10 @@ export default function InquilinosPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleRetirar(inquilino)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleRetirar(inquilino);
+                        }}
                         className="rounded-lg text-xs font-semibold uppercase tracking-wider h-8 text-[hsl(4,100%,62%)] border-[hsl(4,100%,70%)] hover:bg-[hsl(4,100%,70%)] hover:text-white"
                       >
                         <UserX className="mr-1 h-3 w-3" />
