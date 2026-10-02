@@ -43,6 +43,7 @@ export default function CuentasPage() {
     importe: "",
     concepto: "",
     fechaEmitida: "",
+    fechaVencimiento: "",
     estado: "PENDIENTE" as const,
     inquilinoId: "",
   });
@@ -82,6 +83,7 @@ export default function CuentasPage() {
         importe: Number(formData.importe),
         concepto: formData.concepto,
         fechaEmitida: formData.fechaEmitida,
+        fechaVencimiento: formData.fechaVencimiento || undefined,
         estado: formData.estado,
         administrador: { id: admin.id },
         inquilino: { id: Number(formData.inquilinoId) },
@@ -134,6 +136,7 @@ export default function CuentasPage() {
       importe: "",
       concepto: "",
       fechaEmitida: today,
+      fechaVencimiento: "",
       estado: "PENDIENTE",
       inquilinoId: "",
     });
@@ -242,7 +245,7 @@ export default function CuentasPage() {
                 </div>
                 <div>
                   <Label className="text-xs font-semibold uppercase tracking-wider">
-                    Fecha
+                    Fecha de emisión
                   </Label>
                   <Input
                     id="fechaEmitida"
@@ -252,6 +255,21 @@ export default function CuentasPage() {
                       setFormData({ ...formData, fechaEmitida: e.target.value })
                     }
                     required
+                    className="h-10 rounded-lg mt-1"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                    Fecha de vencimiento (opcional)
+                  </Label>
+                  <Input
+                    id="fechaVencimiento"
+                    type="date"
+                    value={formData.fechaVencimiento}
+                    min={formData.fechaEmitida || undefined}
+                    onChange={(e) =>
+                      setFormData({ ...formData, fechaVencimiento: e.target.value })
+                    }
                     className="h-10 rounded-lg mt-1"
                   />
                 </div>
@@ -420,8 +438,13 @@ export default function CuentasPage() {
                           {cuenta.concepto}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {cuenta.fechaEmitida}
+                          Emitida: {cuenta.fechaEmitida}
                         </p>
+                        {cuenta.fechaVencimiento && (
+                          <p className="text-xs font-semibold text-[hsl(4,100%,55%)]">
+                            Vence: {cuenta.fechaVencimiento}
+                          </p>
+                        )}
                       </div>
                     </div>
 

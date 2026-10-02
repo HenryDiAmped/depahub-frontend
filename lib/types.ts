@@ -85,6 +85,7 @@ export interface Cuenta {
   importe: number;
   concepto: string;
   fechaEmitida: string;
+  fechaVencimiento?: string;
   estado: EstadoCuenta;
   administrador?: { id: number };
   inquilino?: { id: number };
