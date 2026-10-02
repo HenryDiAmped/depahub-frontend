@@ -246,6 +246,10 @@ Valores admitidos para `estado`: `ACTIVO`, `FINALIZADO`, `CANCELADO`.
 | `GET` | `/cuentas` | Lista las cuentas. |
 | `GET` | `/cuentas?administradorId={id}` | Lista cuentas de un administrador. |
 | `GET` | `/cuentas?inquilinoId={id}` | Lista cuentas de un inquilino. |
+
+Una cuenta puede incluir opcionalmente `fechaVencimiento` (`YYYY-MM-DD`). Al crear
+un contrato, el sistema genera automáticamente una cuenta por cobrar de garantía y
+una por cada cuota, con sus respectivas fechas de vencimiento.
 | `GET` | `/cuentas?administradorId={id}&inquilinoId={id}` | Aplica ambos filtros. |
 | `GET` | `/cuentas/{id}` | Obtiene una cuenta. |
 | `POST` | `/cuentas` | Crea una cuenta. |
