@@ -227,6 +227,8 @@ titular del contrato puede obtenerlo.
   "fechaFin": "2027-08-31",
   "montoAlquiler": 350,
   "garantia": 350,
+  "frecuencia": 1,
+  "numeroCuotas": 12,
   "estado": "ACTIVO",
   "condiciones": "Pago mensual adelantado",
   "fechaRegistro": "2026-09-04",
