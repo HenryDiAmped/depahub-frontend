@@ -52,14 +52,36 @@ function sumarMeses(fecha: Date, meses: number) {
   return new Date(anioDestino, mesNormalizado, Math.min(fecha.getDate(), ultimoDia));
 }
 
+function fechaComoTexto(fecha: Date) {
+  const anio = fecha.getFullYear();
+  const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+  const dia = String(fecha.getDate()).padStart(2, "0");
+  return `${anio}-${mes}-${dia}`;
+}
+
+function esFrecuenciaCompatible(fechaInicio: string, fechaFin: string, frecuencia: number) {
+  if (!fechaInicio || !fechaFin || frecuencia <= 0) return false;
+
+  const inicio = fechaLocal(fechaInicio);
+  const fin = fechaLocal(fechaFin);
+  if (Number.isNaN(inicio.getTime()) || Number.isNaN(fin.getTime())) return false;
+
+  const finPrimerPeriodo = sumarMeses(inicio, frecuencia);
+  finPrimerPeriodo.setDate(finPrimerPeriodo.getDate() - 1);
+  return fin >= finPrimerPeriodo;
+}
+
+function fechaMinimaFinContrato(fechaInicio: string) {
+  const finPrimerPeriodo = sumarMeses(fechaLocal(fechaInicio), 1);
+  finPrimerPeriodo.setDate(finPrimerPeriodo.getDate() - 1);
+  return fechaComoTexto(finPrimerPeriodo);
+}
+
 function calcularPlanCuotas(fechaInicio: string, fechaFin: string, frecuencia: number): PlanCuotas | null {
-  if (!fechaInicio || !fechaFin || frecuencia <= 0) return null;
+  if (!esFrecuenciaCompatible(fechaInicio, fechaFin, frecuencia)) return null;
 
   const fin = fechaLocal(fechaFin);
   let inicioPeriodo = fechaLocal(fechaInicio);
-  if (Number.isNaN(fin.getTime()) || Number.isNaN(inicioPeriodo.getTime()) || fin < inicioPeriodo) {
-    return null;
-  }
 
   let cuotasCompletas = 0;
   while (true) {
@@ -209,15 +231,54 @@ export default function ContratosPage() {
     }));
   };
 
-  const fechasValidas = Boolean(
-    formData.fechaInicio && formData.fechaFin && formData.fechaFin >= formData.fechaInicio
-  );
+  const handleFechaChange = (campo: "fechaInicio" | "fechaFin", valor: string) => {
+    setFormData((currentFormData) => {
+      const nuevoFormulario = { ...currentFormData, [campo]: valor };
+      const frecuenciaActual = nuevoFormulario.frecuencia === "PERSONALIZADA"
+        ? Number(nuevoFormulario.frecuenciaPersonalizada)
+        : Number(nuevoFormulario.frecuencia);
+
+      if (
+        frecuenciaActual > 0 &&
+        !esFrecuenciaCompatible(
+          nuevoFormulario.fechaInicio,
+          nuevoFormulario.fechaFin,
+          frecuenciaActual
+        )
+      ) {
+        return {
+          ...nuevoFormulario,
+          frecuencia: "",
+          frecuenciaPersonalizada: "",
+        };
+      }
+
+      return nuevoFormulario;
+    });
+  };
+
+  const fechasValidas = esFrecuenciaCompatible(formData.fechaInicio, formData.fechaFin, 1);
   const frecuenciaSeleccionada = formData.frecuencia === "PERSONALIZADA"
     ? Number(formData.frecuenciaPersonalizada)
     : Number(formData.frecuencia);
-  const planCuotas = fechasValidas
+  const frecuenciaCompatible = esFrecuenciaCompatible(
+    formData.fechaInicio,
+    formData.fechaFin,
+    frecuenciaSeleccionada
+  );
+  const planCuotas = frecuenciaCompatible
     ? calcularPlanCuotas(formData.fechaInicio, formData.fechaFin, frecuenciaSeleccionada)
     : null;
+  const fechaFinMinima = formData.fechaInicio
+    ? fechaMinimaFinContrato(formData.fechaInicio)
+    : undefined;
+  const frecuenciasPredefinidas = [
+    { valor: "1", etiqueta: "Mensual" },
+    { valor: "2", etiqueta: "Bimestral" },
+    { valor: "3", etiqueta: "Trimestral" },
+    { valor: "6", etiqueta: "Semestral" },
+    { valor: "12", etiqueta: "Anual" },
+  ];
 
   const handleVerPdf = async (contrato: Contrato) => {
     if (!contrato.id) return;
@@ -324,9 +385,7 @@ export default function ContratosPage() {
                     id="fechaInicio"
                     type="date"
                     value={formData.fechaInicio}
-                    onChange={(e) =>
-                      setFormData({ ...formData, fechaInicio: e.target.value })
-                    }
+                    onChange={(e) => handleFechaChange("fechaInicio", e.target.value)}
                     required
                     className="h-10 rounded-lg mt-1"
                   />
@@ -339,9 +398,8 @@ export default function ContratosPage() {
                     id="fechaFin"
                     type="date"
                     value={formData.fechaFin}
-                    onChange={(e) =>
-                      setFormData({ ...formData, fechaFin: e.target.value })
-                    }
+                    min={fechaFinMinima}
+                    onChange={(e) => handleFechaChange("fechaFin", e.target.value)}
                     required
                     className="h-10 rounded-lg mt-1"
                   />
@@ -365,11 +423,19 @@ export default function ContratosPage() {
                       <SelectValue placeholder={fechasValidas ? "Seleccionar frecuencia" : "Completa las fechas primero"} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">Mensual</SelectItem>
-                      <SelectItem value="2">Bimestral</SelectItem>
-                      <SelectItem value="3">Trimestral</SelectItem>
-                      <SelectItem value="6">Semestral</SelectItem>
-                      <SelectItem value="12">Anual</SelectItem>
+                      {frecuenciasPredefinidas.map((frecuencia) => (
+                        <SelectItem
+                          key={frecuencia.valor}
+                          value={frecuencia.valor}
+                          disabled={!esFrecuenciaCompatible(
+                            formData.fechaInicio,
+                            formData.fechaFin,
+                            Number(frecuencia.valor)
+                          )}
+                        >
+                          {frecuencia.etiqueta}
+                        </SelectItem>
+                      ))}
                       <SelectItem value="PERSONALIZADA">Personalizada</SelectItem>
                     </SelectContent>
                   </Select>
@@ -404,6 +470,11 @@ export default function ContratosPage() {
                         : `${planCuotas.cuotasCompletas} cuotas completas.`}
                     </p>
                   </div>
+                )}
+                {formData.fechaInicio && formData.fechaFin && !fechasValidas && (
+                  <p className="col-span-2 text-xs font-medium text-destructive">
+                    El contrato debe durar como mínimo un mes completo.
+                  </p>
                 )}
                 <div>
                   <Label className="text-xs font-semibold uppercase tracking-wider">

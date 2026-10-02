@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, CreditCard, ArrowUpCircle, ArrowDownCircle, CheckCircle2 } from "lucide-react";
+import { Plus, CreditCard, ArrowUpCircle, ArrowDownCircle, CheckCircle2, FileText, User } from "lucide-react";
 import { cuentasApi, inquilinosApi } from "@/lib/api";
 import type { Cuenta, Inquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
@@ -61,7 +61,12 @@ export default function CuentasPage() {
         inquilinosApi.getAll(),
       ]);
       setCuentas(cuentasData);
-      setInquilinos(inquilinosData);
+      setInquilinos(
+        inquilinosData.filter(
+          (inquilino) =>
+            inquilino.inmueble?.propiedad?.administrador?.id === admin.id
+        )
+      );
     } catch (error) {
       toast({
         variant: "destructive",
@@ -149,6 +154,15 @@ export default function CuentasPage() {
   const totalPorPagar = cuentasPendientes
     .filter((c) => c.tipo === "POR_PAGAR")
     .reduce((sum, c) => sum + c.importe, 0);
+
+  const nombreInquilino = (cuenta: Cuenta) => {
+    if (cuenta.inquilino?.nombreCompleto) return cuenta.inquilino.nombreCompleto;
+
+    const inquilino = inquilinos.find(
+      (item) => item.id === cuenta.inquilino?.id
+    );
+    return inquilino?.nombreCompleto ?? "Sin inquilino asignado";
+  };
 
   return (
     <div className="space-y-6">
@@ -437,6 +451,18 @@ export default function CuentasPage() {
                         <p className="text-sm font-semibold text-foreground">
                           {cuenta.concepto}
                         </p>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <User className="h-3.5 w-3.5" />
+                            Inquilino: {nombreInquilino(cuenta)}
+                          </span>
+                          {cuenta.contrato?.id && (
+                            <span className="flex items-center gap-1">
+                              <FileText className="h-3.5 w-3.5" />
+                              Contrato #{cuenta.contrato.id}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-muted-foreground">
                           Emitida: {cuenta.fechaEmitida}
                         </p>
