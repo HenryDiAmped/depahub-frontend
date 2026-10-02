@@ -29,7 +29,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Users, Edit, UserX, Phone, Mail, Home } from "lucide-react";
+import { Plus, Users, Edit, UserX, Phone, Mail, Home, ChevronRight } from "lucide-react";
 import { inquilinosApi, inmueblesApi } from "@/lib/api";
 import type { Inquilino, Inmueble, EstadoInquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
@@ -421,7 +421,7 @@ export default function InquilinosPage() {
                     router.push(`/dashboard/inquilinos/${inquilino.id}`);
                   }
                 }}
-                className="cursor-pointer overflow-hidden border-0 shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(4,100%,70%)]"
+                className="group cursor-pointer overflow-hidden border border-transparent shadow-sm transition-all hover:-translate-y-0.5 hover:border-[hsl(4,100%,70%)] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(4,100%,70%)]"
               >
                 {/* Card header: dark navy */}
                 <CardHeader
@@ -471,6 +471,10 @@ export default function InquilinosPage() {
                       </span>
                     </div>
                   )}
+                  <div className="flex items-center justify-between rounded-lg bg-[hsl(4,100%,96%)] px-3 py-2 text-xs font-semibold text-[hsl(4,100%,55%)] transition-colors group-hover:bg-[hsl(4,100%,70%)] group-hover:text-white">
+                    <span>Ver información y pagos</span>
+                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </div>
 
                   {/* Action buttons */}
                   <div className="pt-2 flex gap-2">
