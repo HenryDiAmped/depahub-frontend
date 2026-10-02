@@ -88,7 +88,8 @@ export interface Cuenta {
   fechaVencimiento?: string;
   estado: EstadoCuenta;
   administrador?: { id: number };
-  inquilino?: { id: number };
+  inquilino?: { id: number; nombreCompleto?: string };
+  contrato?: { id: number };
 }
 
 export interface BalanceMensual {
