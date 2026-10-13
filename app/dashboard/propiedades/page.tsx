@@ -304,7 +304,7 @@ export default function PropiedadesPage() {
             >
               {/* Card header: dark navy */}
               <CardHeader
-                className="px-4 py-3 flex flex-row items-center justify-between space-y-0"
+                className="px-4 py-3 flex flex-row items-center space-y-0"
                 style={{ background: NAV_BG }}
               >
                 <div className="flex items-center gap-2 min-w-0">
@@ -314,38 +314,6 @@ export default function PropiedadesPage() {
                   <CardTitle className="text-sm font-bold uppercase tracking-wider text-white truncate">
                     {propiedad.nombre}
                   </CardTitle>
-                </div>
-                {/* Action buttons over dark bg */}
-                <div className="flex shrink-0 gap-1 ml-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/15 rounded-md"
-                    onClick={() =>
-                      router.push(`/dashboard/propiedades/${propiedad.id}`)
-                    }
-                    title="Ver inmuebles"
-                  >
-                    <Eye className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/15 rounded-md"
-                    onClick={() => handleEdit(propiedad)}
-                    title="Editar"
-                  >
-                    <Edit className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-white/70 hover:text-[hsl(4,100%,70%)] hover:bg-white/15 rounded-md"
-                    onClick={() => handleDelete(propiedad.id!)}
-                    title="Eliminar"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
                 </div>
               </CardHeader>
 
@@ -363,6 +331,37 @@ export default function PropiedadesPage() {
                     {propiedad.descripcion}
                   </p>
                 )}
+                <div className="flex gap-2 pt-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      router.push(`/dashboard/propiedades/${propiedad.id}`)
+                    }
+                    className="flex-1 rounded-lg text-xs font-semibold uppercase tracking-wider h-8"
+                  >
+                    <Eye className="mr-1 h-3 w-3" />
+                    Ver
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEdit(propiedad)}
+                    className="flex-1 rounded-lg text-xs font-semibold uppercase tracking-wider h-8"
+                  >
+                    <Edit className="mr-1 h-3 w-3" />
+                    Editar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDelete(propiedad.id!)}
+                    className="flex-1 rounded-lg text-xs font-semibold uppercase tracking-wider h-8 text-[hsl(4,100%,62%)] border-[hsl(4,100%,70%)] hover:bg-[hsl(4,100%,70%)] hover:text-white"
+                  >
+                    <Trash2 className="mr-1 h-3 w-3" />
+                    Eliminar
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
