@@ -41,33 +41,27 @@ import {
   GroupedBarChart,
   HorizontalBarChart,
 } from "@/components/dashboard/charts";
-
-const MESES_CORTOS = [
-  "Ene",
-  "Feb",
-  "Mar",
-  "Abr",
-  "May",
-  "Jun",
-  "Jul",
-  "Ago",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dic",
-];
+import {
+  balancesParaGrafico,
+  calcularMetricasDashboard,
+  contarContratosPorEstado,
+  contarInquilinosPorEstado,
+  formatMoney,
+  inmueblesPorPropiedad as contarInmueblesPorPropiedad,
+  montosCuentasPorTipo,
+  ocupacionPorPropiedad as calcularOcupacionPorPropiedad,
+  propiedadesPorDistrito as agruparPropiedadesPorDistrito,
+  rentaPorPropiedad as calcularRentaPorPropiedad,
+} from "@/lib/dashboard-metrics";
+import {
+  filtrarInmueblesDelAdministrador,
+  filtrarInquilinosDelAdministrador,
+} from "@/lib/filtros";
 
 const COLOR_NAVY = "hsl(229, 29%, 30%)";
 const COLOR_CORAL = "hsl(4, 100%, 70%)";
 const COLOR_GREEN = "hsl(131, 44%, 62%)";
 const COLOR_NAVY_SOFT = "hsl(229, 29%, 48%)";
-
-function formatMoney(value: number) {
-  return `S/. ${value.toLocaleString("es-PE", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
 
 export default function DashboardPage() {
   const { admin } = useAuth();
@@ -100,12 +94,13 @@ export default function DashboardPage() {
           cuentasApi.getAll(admin.id),
         ]);
 
-        const inmueblesDelAdministrador = inmueblesData.filter(
-          (inmueble) => inmueble.propiedad?.administrador?.id === admin.id
+        const inmueblesDelAdministrador = filtrarInmueblesDelAdministrador(
+          inmueblesData,
+          admin.id
         );
-        const inquilinosDelAdministrador = inquilinosData.filter(
-          (inquilino) =>
-            inquilino.inmueble?.propiedad?.administrador?.id === admin.id
+        const inquilinosDelAdministrador = filtrarInquilinosDelAdministrador(
+          inquilinosData,
+          admin.id
         );
 
         setPropiedades(propiedadesData);
@@ -124,85 +119,15 @@ export default function DashboardPage() {
     fetchStats();
   }, [admin]);
 
-  const metrics = useMemo(() => {
-    const ocupados = inmuebles.filter((item) => item.estado === "OCUPADO").length;
-    const disponibles = inmuebles.filter((item) => item.estado === "DISPONIBLE").length;
-    const mantenimiento = inmuebles.filter(
-      (item) => item.estado === "MANTENIMIENTO"
-    ).length;
-    const ocupacion =
-      inmuebles.length === 0 ? 0 : Math.round((ocupados / inmuebles.length) * 100);
+  const metrics = useMemo(
+    () => calcularMetricasDashboard(inmuebles, contratos, cuentas, balances),
+    [inmuebles, contratos, cuentas, balances]
+  );
 
-    const contratosActivos = contratos.filter((item) => item.estado === "ACTIVO");
-    const rentaPromedio =
-      contratosActivos.length === 0
-        ? 0
-        : contratosActivos.reduce((sum, item) => sum + (item.montoAlquiler || 0), 0) /
-          contratosActivos.length;
-
-    const porCobrar = cuentas
-      .filter((item) => item.tipo === "POR_COBRAR" && item.estado === "PENDIENTE")
-      .reduce((sum, item) => sum + (item.importe || 0), 0);
-    const porPagar = cuentas
-      .filter((item) => item.tipo === "POR_PAGAR" && item.estado === "PENDIENTE")
-      .reduce((sum, item) => sum + (item.importe || 0), 0);
-
-    const ingresos = balances.reduce(
-      (sum, item) => sum + (item.totalIngresos || 0),
-      0
-    );
-    const egresos = balances.reduce(
-      (sum, item) => sum + (item.totalEgresos || 0),
-      0
-    );
-    const utilidad = balances.reduce(
-      (sum, item) => sum + (item.utilidad || 0),
-      0
-    );
-    const rentaOcupada = inmuebles
-      .filter((item) => item.estado === "OCUPADO")
-      .reduce((sum, item) => sum + (item.precioBase || 0), 0);
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    const cuentasVencidas = cuentas.filter((item) => {
-      if (item.estado !== "PENDIENTE" || !item.fechaVencimiento) return false;
-      const vencimiento = new Date(item.fechaVencimiento);
-      return !Number.isNaN(vencimiento.getTime()) && vencimiento < hoy;
-    }).length;
-    const garantiaTotal = contratosActivos.reduce(
-      (sum, item) => sum + (item.garantia || 0),
-      0
-    );
-
-    return {
-      ocupados,
-      disponibles,
-      mantenimiento,
-      ocupacion,
-      contratosActivos: contratosActivos.length,
-      rentaPromedio,
-      porCobrar,
-      porPagar,
-      ingresos,
-      egresos,
-      utilidad,
-      rentaOcupada,
-      cuentasVencidas,
-      garantiaTotal,
-    };
-  }, [inmuebles, contratos, cuentas, balances]);
-
-  const balancesChart = useMemo(() => {
-    return [...balances]
-      .sort((a, b) => a.anio - b.anio || a.mes - b.mes)
-      .slice(-12)
-      .map((item) => ({
-        label: `${MESES_CORTOS[item.mes - 1]} ${String(item.anio).slice(-2)}`,
-        ingresos: item.totalIngresos || 0,
-        egresos: item.totalEgresos || 0,
-        utilidad: item.utilidad || 0,
-      }));
-  }, [balances]);
+  const balancesChart = useMemo(
+    () => balancesParaGrafico(balances),
+    [balances]
+  );
 
   const inmueblesPorEstado = [
     { name: "Ocupados", value: metrics.ocupados, color: COLOR_GREEN },
@@ -210,102 +135,43 @@ export default function DashboardPage() {
     { name: "Mantenimiento", value: metrics.mantenimiento, color: COLOR_CORAL },
   ];
 
+  const contratosPorEstadoConteo = contarContratosPorEstado(contratos);
   const contratosPorEstado = [
-    {
-      name: "Activos",
-      value: contratos.filter((item) => item.estado === "ACTIVO").length,
-      color: COLOR_GREEN,
-    },
-    {
-      name: "Finalizados",
-      value: contratos.filter((item) => item.estado === "FINALIZADO").length,
-      color: COLOR_NAVY,
-    },
-    {
-      name: "Cancelados",
-      value: contratos.filter((item) => item.estado === "CANCELADO").length,
-      color: COLOR_CORAL,
-    },
+    { name: "Activos", value: contratosPorEstadoConteo.activos, color: COLOR_GREEN },
+    { name: "Finalizados", value: contratosPorEstadoConteo.finalizados, color: COLOR_NAVY },
+    { name: "Cancelados", value: contratosPorEstadoConteo.cancelados, color: COLOR_CORAL },
   ];
 
-  const inmueblesPorPropiedad = propiedades.map((propiedad) => ({
-    name: propiedad.nombre,
-    value: inmuebles.filter((item) => item.propiedad?.id === propiedad.id).length,
-    color: COLOR_NAVY_SOFT,
-  }));
+  const inmueblesPorPropiedad = contarInmueblesPorPropiedad(propiedades, inmuebles).map(
+    (item) => ({ ...item, color: COLOR_NAVY_SOFT })
+  );
 
-  const rentaPorPropiedad = propiedades.map((propiedad) => ({
-    name: propiedad.nombre,
-    value: inmuebles
-      .filter((item) => item.propiedad?.id === propiedad.id)
-      .reduce((sum, item) => sum + (item.precioBase || 0), 0),
-    color: COLOR_GREEN,
-  }));
+  const rentaPorPropiedad = calcularRentaPorPropiedad(propiedades, inmuebles).map(
+    (item) => ({ ...item, color: COLOR_GREEN })
+  );
 
+  const cuentasPorTipoMontos = montosCuentasPorTipo(cuentas);
   const cuentasPorTipo = [
-    {
-      name: "Por cobrar",
-      value: cuentas
-        .filter((item) => item.tipo === "POR_COBRAR" && item.estado === "PENDIENTE")
-        .reduce((sum, item) => sum + (item.importe || 0), 0),
-      color: COLOR_GREEN,
-    },
-    {
-      name: "Por pagar",
-      value: cuentas
-        .filter((item) => item.tipo === "POR_PAGAR" && item.estado === "PENDIENTE")
-        .reduce((sum, item) => sum + (item.importe || 0), 0),
-      color: COLOR_CORAL,
-    },
-    {
-      name: "Saldadas",
-      value: cuentas
-        .filter((item) => item.estado === "SALDADA")
-        .reduce((sum, item) => sum + (item.importe || 0), 0),
-      color: COLOR_NAVY,
-    },
+    { name: "Por cobrar", value: cuentasPorTipoMontos.porCobrar, color: COLOR_GREEN },
+    { name: "Por pagar", value: cuentasPorTipoMontos.porPagar, color: COLOR_CORAL },
+    { name: "Saldadas", value: cuentasPorTipoMontos.saldadas, color: COLOR_NAVY },
   ];
 
+  const inquilinosPorEstadoConteo = contarInquilinosPorEstado(inquilinos);
   const inquilinosPorEstado = [
-    {
-      name: "Activos",
-      value: inquilinos.filter((item) => item.estado === "ACTIVO").length,
-      color: COLOR_GREEN,
-    },
-    {
-      name: "Retirados",
-      value: inquilinos.filter((item) => item.estado === "RETIRADO").length,
-      color: COLOR_CORAL,
-    },
+    { name: "Activos", value: inquilinosPorEstadoConteo.activos, color: COLOR_GREEN },
+    { name: "Retirados", value: inquilinosPorEstadoConteo.retirados, color: COLOR_CORAL },
   ];
 
-  const ocupacionPorPropiedad = propiedades.map((propiedad) => ({
-    label: propiedad.nombre,
-    ocupados: inmuebles.filter(
-      (item) => item.propiedad?.id === propiedad.id && item.estado === "OCUPADO"
-    ).length,
-    disponibles: inmuebles.filter(
-      (item) =>
-        item.propiedad?.id === propiedad.id && item.estado === "DISPONIBLE"
-    ).length,
-    mantenimiento: inmuebles.filter(
-      (item) =>
-        item.propiedad?.id === propiedad.id && item.estado === "MANTENIMIENTO"
-    ).length,
-  }));
+  const ocupacionPorPropiedad = calcularOcupacionPorPropiedad(propiedades, inmuebles);
 
   const DISTRITO_COLORS = [COLOR_NAVY, COLOR_CORAL, COLOR_GREEN, COLOR_NAVY_SOFT];
-  const propiedadesPorDistrito = Object.entries(
-    propiedades.reduce<Record<string, number>>((acc, propiedad) => {
-      const distrito = propiedad.distrito?.trim() || "Sin distrito";
-      acc[distrito] = (acc[distrito] || 0) + 1;
-      return acc;
-    }, {})
-  ).map(([name, value], index) => ({
-    name,
-    value,
-    color: DISTRITO_COLORS[index % DISTRITO_COLORS.length],
-  }));
+  const propiedadesPorDistrito = agruparPropiedadesPorDistrito(propiedades).map(
+    (item, index) => ({
+      ...item,
+      color: DISTRITO_COLORS[index % DISTRITO_COLORS.length],
+    })
+  );
 
   const statCards = [
     {

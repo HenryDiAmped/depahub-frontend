@@ -29,6 +29,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, CreditCard, ArrowUpCircle, ArrowDownCircle, CheckCircle2, FileText, User } from "lucide-react";
 import { cuentasApi, inquilinosApi } from "@/lib/api";
+import { nombreInquilinoDeCuenta, totalesCuentasPendientes } from "@/lib/cuentas";
+import { filtrarInquilinosDelAdministrador } from "@/lib/filtros";
 import type { Cuenta, Inquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 
@@ -61,12 +63,7 @@ export default function CuentasPage() {
         inquilinosApi.getAll(),
       ]);
       setCuentas(cuentasData);
-      setInquilinos(
-        inquilinosData.filter(
-          (inquilino) =>
-            inquilino.inmueble?.propiedad?.administrador?.id === admin.id
-        )
-      );
+      setInquilinos(filtrarInquilinosDelAdministrador(inquilinosData, admin.id));
     } catch (error) {
       toast({
         variant: "destructive",
@@ -147,22 +144,10 @@ export default function CuentasPage() {
     });
   };
 
-  const cuentasPendientes = cuentas.filter((c) => c.estado === "PENDIENTE");
-  const totalPorCobrar = cuentasPendientes
-    .filter((c) => c.tipo === "POR_COBRAR")
-    .reduce((sum, c) => sum + c.importe, 0);
-  const totalPorPagar = cuentasPendientes
-    .filter((c) => c.tipo === "POR_PAGAR")
-    .reduce((sum, c) => sum + c.importe, 0);
-
-  const nombreInquilino = (cuenta: Cuenta) => {
-    if (cuenta.inquilino?.nombreCompleto) return cuenta.inquilino.nombreCompleto;
-
-    const inquilino = inquilinos.find(
-      (item) => item.id === cuenta.inquilino?.id
-    );
-    return inquilino?.nombreCompleto ?? "Sin inquilino asignado";
-  };
+  const { cuentasPendientes, totalPorCobrar, totalPorPagar } =
+    totalesCuentasPendientes(cuentas);
+  const nombreInquilino = (cuenta: Cuenta) =>
+    nombreInquilinoDeCuenta(cuenta, inquilinos);
 
   return (
     <div className="space-y-6">

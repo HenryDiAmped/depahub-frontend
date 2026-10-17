@@ -31,6 +31,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Users, Edit, UserX, Phone, Mail, Home, ChevronRight } from "lucide-react";
 import { inquilinosApi, inmueblesApi } from "@/lib/api";
+import {
+  filtrarInmueblesDelAdministrador,
+  filtrarInquilinosDelAdministrador,
+} from "@/lib/filtros";
 import type { Inquilino, Inmueble, EstadoInquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 
@@ -67,12 +71,13 @@ export default function InquilinosPage() {
         inmueblesApi.getAll(),
       ]);
 
-      const inmueblesDelAdministrador = inmueblesData.filter(
-        (inmueble) => inmueble.propiedad?.administrador?.id === admin.id
+      const inmueblesDelAdministrador = filtrarInmueblesDelAdministrador(
+        inmueblesData,
+        admin.id
       );
-      const inquilinosDelAdministrador = inquilinosData.filter(
-        (inquilino) =>
-          inquilino.inmueble?.propiedad?.administrador?.id === admin.id
+      const inquilinosDelAdministrador = filtrarInquilinosDelAdministrador(
+        inquilinosData,
+        admin.id
       );
 
       setInquilinos(inquilinosDelAdministrador);
