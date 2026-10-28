@@ -28,28 +28,12 @@ function jsonResponse(
     "content-type": "application/json",
     ...init.headers,
   });
-  return {
-    ok: status >= 200 && status < 300,
-    status,
-    headers,
-    json: async () => body,
-    text: async () => payload,
-    blob: async () => new Blob([payload]),
-  } as Response;
+  return new Response(payload, { status, headers });
 }
 
 function emptyResponse(status = 204, extraHeaders: Record<string, string> = {}) {
   const headers = new Headers(extraHeaders);
-  return {
-    ok: status >= 200 && status < 300,
-    status,
-    headers,
-    json: async () => {
-      throw new Error("no json");
-    },
-    text: async () => "",
-    blob: async () => new Blob([]),
-  } as Response;
+  return new Response(null, { status, headers });
 }
 
 function lastCall() {
@@ -147,23 +131,21 @@ describe("api client", () => {
 
   it("contratosApi.obtenerPdf pide Accept application/pdf y devuelve un Blob", async () => {
     const pdf = new Blob(["%PDF"], { type: "application/pdf" });
-    fetchMock.mockResolvedValue({
-      ok: true,
-      status: 200,
-      headers: new Headers({ "content-type": "application/pdf" }),
-      json: async () => ({}),
-      text: async () => "",
-      blob: async () => pdf,
-    } as Response);
+    fetchMock.mockResolvedValue(
+      new Response(pdf, {
+        status: 200,
+        headers: { "content-type": "application/pdf" },
+      })
+    );
 
     const result = await contratosApi.obtenerPdf(9);
-    expect(result).toBe(pdf);
+    expect(await result.text()).toBe("%PDF");
     expect(lastCall().url).toBe("http://localhost:8080/api/contratos/9/pdf");
     expect(lastCall().headers.get("Accept")).toBe("application/pdf");
   });
 
   it("arma query params de propiedades, contratos e ingresos", async () => {
-    fetchMock.mockResolvedValue(jsonResponse([]));
+    fetchMock.mockImplementation(() => Promise.resolve(jsonResponse([])));
 
     await propiedadesApi.getAll(1);
     expect(lastCall().url).toBe(
