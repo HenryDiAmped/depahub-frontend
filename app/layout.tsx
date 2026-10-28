@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
 import { Toaster } from "@/components/ui/toaster";
+import { AccessibilityMenu } from "@/components/accessibility/accessibility-menu";
 
 export const metadata: Metadata = {
   title: "DepaHub - Sistema de Gestión de Alquileres",
@@ -19,6 +20,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
           <Toaster />
+          <AccessibilityMenu />
         </AuthProvider>
       </body>
     </html>
