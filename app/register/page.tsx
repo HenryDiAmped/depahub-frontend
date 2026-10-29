@@ -17,6 +17,7 @@ import {
 import { Building2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { CharacterCounter } from "@/components/ui/character-counter";
+import { evaluatePassword } from "@/lib/password";
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -29,6 +30,7 @@ export default function RegisterPage() {
     confirmPassword: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const passwordEvaluation = evaluatePassword(formData.password);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,6 +38,15 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!passwordEvaluation.isValid) {
+      toast({
+        variant: "destructive",
+        title: "Contraseña insuficiente",
+        description: "Usa al menos 9 caracteres, una letra mayúscula y un número.",
+      });
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       toast({
@@ -166,10 +177,22 @@ export default function RegisterPage() {
                 value={formData.password}
                 onChange={handleChange}
                 required
+                minLength={9}
                 disabled={isLoading}
                 className="h-10 rounded-lg border-border focus-visible:ring-[hsl(4,100%,70%)]"
               />
               <CharacterCounter value={formData.password} limit={100} />
+              <div className="rounded-md bg-muted px-3 py-2 text-xs" aria-live="polite">
+                <p className={passwordEvaluation.strength === "débil" ? "font-semibold text-destructive" : "font-semibold text-foreground"}>
+                  Seguridad: {passwordEvaluation.strength}
+                </p>
+                <p className="mt-1 text-muted-foreground">
+                  Mínimo 9 caracteres, una mayúscula y un número.
+                </p>
+                {!passwordEvaluation.hasMinimumLength && formData.password && <p className="mt-1 text-destructive">Faltan {9 - formData.password.length} caracteres.</p>}
+                {!passwordEvaluation.hasUppercase && formData.password && <p className="mt-1 text-destructive">Agrega al menos una letra mayúscula.</p>}
+                {!passwordEvaluation.hasNumber && formData.password && <p className="mt-1 text-destructive">Agrega al menos un número.</p>}
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="confirmPassword" className="text-xs font-semibold uppercase tracking-wider text-foreground">
@@ -193,7 +216,7 @@ export default function RegisterPage() {
             <Button
               type="submit"
               className="w-full h-10 rounded-lg bg-[hsl(4,100%,70%)] text-white font-bold uppercase tracking-wider hover:bg-[hsl(4,100%,62%)] shadow-md"
-              disabled={isLoading}
+              disabled={isLoading || !passwordEvaluation.isValid}
             >
               {isLoading ? "Registrando..." : "Registrarse"}
             </Button>
