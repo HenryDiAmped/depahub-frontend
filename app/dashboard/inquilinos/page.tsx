@@ -194,23 +194,11 @@ export default function InquilinosPage() {
       return;
 
     try {
-      const inmuebleId = inquilino.inmueble?.id;
-
       await inquilinosApi.update(inquilino.id!, {
         ...inquilino,
         estado: "RETIRADO",
         inmueble: undefined,
       });
-
-      if (inmuebleId) {
-        const inmueble = inmuebles.find(i => i.id === inmuebleId);
-        if (inmueble) {
-          await inmueblesApi.update(inmuebleId, {
-            ...inmueble,
-            estado: "DISPONIBLE",
-          });
-        }
-      }
 
       toast({
         title: "Inquilino retirado",
