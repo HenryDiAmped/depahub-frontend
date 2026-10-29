@@ -33,7 +33,11 @@ export default function RegisterPage() {
   const passwordEvaluation = evaluatePassword(formData.password);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const valueWithoutLetters = name === "dni" || name === "telefono"
+      ? value.replace(/\D/g, "")
+      : value;
+    setFormData({ ...formData, [name]: valueWithoutLetters });
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -121,6 +125,8 @@ export default function RegisterPage() {
                   id="dni"
                   name="dni"
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="12345678"
                   value={formData.dni}
                   onChange={handleChange}
@@ -138,6 +144,8 @@ export default function RegisterPage() {
                   id="telefono"
                   name="telefono"
                   type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="987654321"
                   value={formData.telefono}
                   onChange={handleChange}

@@ -292,9 +292,11 @@ export default function InquilinosPage() {
                   </Label>
                   <Input
                     id="dni"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={formData.dni}
                     onChange={(e) =>
-                      setFormData({ ...formData, dni: e.target.value })
+                      setFormData({ ...formData, dni: e.target.value.replace(/\D/g, "") })
                     }
                     required
                     className="h-10 rounded-lg mt-1"
@@ -307,9 +309,12 @@ export default function InquilinosPage() {
                   </Label>
                   <Input
                     id="telefono"
+                    type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={formData.telefono}
                     onChange={(e) =>
-                      setFormData({ ...formData, telefono: e.target.value })
+                      setFormData({ ...formData, telefono: e.target.value.replace(/\D/g, "") })
                     }
                     required
                     className="h-10 rounded-lg mt-1"
