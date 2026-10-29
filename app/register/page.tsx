@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Building2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { CharacterCounter } from "@/components/ui/character-counter";
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -98,6 +99,7 @@ export default function RegisterPage() {
                 disabled={isLoading}
                 className="h-10 rounded-lg border-border focus-visible:ring-[hsl(4,100%,70%)]"
               />
+              <CharacterCounter value={formData.nombreCompleto} limit={45} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
@@ -115,6 +117,7 @@ export default function RegisterPage() {
                   disabled={isLoading}
                   className="h-10 rounded-lg border-border focus-visible:ring-[hsl(4,100%,70%)]"
                 />
+                <CharacterCounter value={formData.dni} limit={8} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="telefono" className="text-xs font-semibold uppercase tracking-wider text-foreground">
@@ -131,6 +134,7 @@ export default function RegisterPage() {
                   disabled={isLoading}
                   className="h-10 rounded-lg border-border focus-visible:ring-[hsl(4,100%,70%)]"
                 />
+                <CharacterCounter value={formData.telefono} limit={9} />
               </div>
             </div>
             <div className="space-y-1.5">
@@ -148,6 +152,7 @@ export default function RegisterPage() {
                 disabled={isLoading}
                 className="h-10 rounded-lg border-border focus-visible:ring-[hsl(4,100%,70%)]"
               />
+              <CharacterCounter value={formData.email} limit={45} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-foreground">
@@ -164,6 +169,7 @@ export default function RegisterPage() {
                 disabled={isLoading}
                 className="h-10 rounded-lg border-border focus-visible:ring-[hsl(4,100%,70%)]"
               />
+              <CharacterCounter value={formData.password} limit={100} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="confirmPassword" className="text-xs font-semibold uppercase tracking-wider text-foreground">
@@ -180,6 +186,7 @@ export default function RegisterPage() {
                 disabled={isLoading}
                 className="h-10 rounded-lg border-border focus-visible:ring-[hsl(4,100%,70%)]"
               />
+              <CharacterCounter value={formData.confirmPassword} limit={100} />
             </div>
           </CardContent>
           <CardFooter className="bg-white flex flex-col space-y-3 px-6 pb-6 pt-2">

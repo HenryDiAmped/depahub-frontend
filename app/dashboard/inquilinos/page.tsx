@@ -38,6 +38,7 @@ import {
 import type { Inquilino, Inmueble, EstadoInquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { errorHandlers } from "@/lib/error-handler";
+import { CharacterCounter } from "@/components/ui/character-counter";
 
 export default function InquilinosPage() {
   const { admin } = useAuth();
@@ -283,6 +284,7 @@ export default function InquilinosPage() {
                     required
                     className="h-10 rounded-lg mt-1"
                   />
+                  <CharacterCounter value={formData.nombreCompleto} limit={45} />
                 </div>
                 <div>
                   <Label className="text-xs font-semibold uppercase tracking-wider">
@@ -297,6 +299,7 @@ export default function InquilinosPage() {
                     required
                     className="h-10 rounded-lg mt-1"
                   />
+                  <CharacterCounter value={formData.dni} limit={8} />
                 </div>
                 <div>
                   <Label className="text-xs font-semibold uppercase tracking-wider">
@@ -311,6 +314,7 @@ export default function InquilinosPage() {
                     required
                     className="h-10 rounded-lg mt-1"
                   />
+                  <CharacterCounter value={formData.telefono} limit={9} />
                 </div>
                 <div>
                   <Label className="text-xs font-semibold uppercase tracking-wider">
@@ -326,6 +330,7 @@ export default function InquilinosPage() {
                     placeholder="correo@ejemplo.com"
                     className="h-10 rounded-lg mt-1"
                   />
+                  <CharacterCounter value={formData.email} limit={45} />
                 </div>
                 <div>
                   <Label className="text-xs font-semibold uppercase tracking-wider">

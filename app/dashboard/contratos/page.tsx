@@ -39,6 +39,7 @@ import { filtrarInquilinosActivosDelAdministrador } from "@/lib/filtros";
 import type { Contrato, Inquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { errorHandlers } from "@/lib/error-handler";
+import { CharacterCounter } from "@/components/ui/character-counter";
 
 export default function ContratosPage() {
   const { admin } = useAuth();
@@ -459,6 +460,7 @@ export default function ContratosPage() {
                     placeholder="Ej: Pago mensual, mantenimiento incluido..."
                     className="rounded-lg mt-1"
                   />
+                  <CharacterCounter value={formData.condiciones} limit={200} />
                 </div>
               </div>
               <DialogFooter className="mt-6 gap-2">

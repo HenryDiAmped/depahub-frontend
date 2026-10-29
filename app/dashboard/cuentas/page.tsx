@@ -34,6 +34,7 @@ import { filtrarInquilinosDelAdministrador } from "@/lib/filtros";
 import type { Cuenta, Inquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { errorHandlers } from "@/lib/error-handler";
+import { CharacterCounter } from "@/components/ui/character-counter";
 
 export default function CuentasPage() {
   const { admin } = useAuth();
@@ -260,6 +261,7 @@ export default function CuentasPage() {
                     required
                     className="h-10 rounded-lg mt-1"
                   />
+                  <CharacterCounter value={formData.concepto} limit={45} />
                 </div>
                 <div>
                   <Label className="text-xs font-semibold uppercase tracking-wider">

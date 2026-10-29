@@ -33,6 +33,7 @@ import { propiedadesApi, inmueblesApi, inquilinosApi } from "@/lib/api";
 import type { Propiedad, Inmueble, EstadoInmueble, Inquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { errorHandlers } from "@/lib/error-handler";
+import { CharacterCounter } from "@/components/ui/character-counter";
 
 export default function PropiedadDetallePage() {
   const params = useParams();
@@ -243,6 +244,7 @@ export default function PropiedadDetallePage() {
                     required
                     className="h-10 rounded-lg mt-1"
                   />
+                  <CharacterCounter value={formData.nombre} limit={45} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -311,6 +313,7 @@ export default function PropiedadDetallePage() {
                     }
                     className="rounded-lg mt-1"
                   />
+                  <CharacterCounter value={formData.descripcion} limit={255} />
                 </div>
               </div>
               <DialogFooter className="mt-6 gap-2">

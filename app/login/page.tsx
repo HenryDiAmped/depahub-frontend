@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Building2 } from "lucide-react";
+import { CharacterCounter } from "@/components/ui/character-counter";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -67,6 +68,7 @@ export default function LoginPage() {
                 disabled={isLoading}
                 className="h-10 rounded-lg border-border focus-visible:ring-[hsl(4,100%,70%)]"
               />
+              <CharacterCounter value={email} limit={45} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-foreground">
@@ -82,6 +84,7 @@ export default function LoginPage() {
                 disabled={isLoading}
                 className="h-10 rounded-lg border-border focus-visible:ring-[hsl(4,100%,70%)]"
               />
+              <CharacterCounter value={password} limit={100} />
             </div>
           </CardContent>
           <CardFooter className="bg-white flex flex-col space-y-3 px-6 pb-6 pt-2">
