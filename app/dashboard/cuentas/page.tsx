@@ -33,6 +33,7 @@ import { nombreInquilinoDeCuenta, totalesCuentasPendientes } from "@/lib/cuentas
 import { filtrarInquilinosDelAdministrador } from "@/lib/filtros";
 import type { Cuenta, Inquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
+import { errorHandlers } from "@/lib/error-handler";
 
 export default function CuentasPage() {
   const { admin } = useAuth();
@@ -65,10 +66,11 @@ export default function CuentasPage() {
       setCuentas(cuentasData);
       setInquilinos(filtrarInquilinosDelAdministrador(inquilinosData, admin.id));
     } catch (error) {
+      const { title, description } = errorHandlers.fetch(error, "las cuentas y los inquilinos");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudieron cargar los datos",
+        title,
+        description,
       });
     } finally {
       setIsLoading(false);
@@ -101,10 +103,11 @@ export default function CuentasPage() {
       resetForm();
       fetchData();
     } catch (error) {
+      const { title, description } = errorHandlers.create(error, "la cuenta");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudo crear la cuenta",
+        title,
+        description,
       });
     }
   };
@@ -123,10 +126,11 @@ export default function CuentasPage() {
       });
       fetchData();
     } catch (error) {
+      const { title, description } = errorHandlers.update(error, "la cuenta");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudo actualizar la cuenta",
+        title,
+        description,
       });
     }
   };

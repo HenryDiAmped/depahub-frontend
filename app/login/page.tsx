@@ -28,8 +28,8 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-    } catch (error) {
-      console.error("Error en login:", error);
+    } catch {
+      // AuthProvider ya informa un mensaje claro mediante una notificación.
     } finally {
       setIsLoading(false);
     }

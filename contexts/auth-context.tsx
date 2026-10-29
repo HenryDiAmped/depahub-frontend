@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Administrador } from "@/lib/types";
 import { authApi } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import { getAuthErrorMessage } from "@/lib/error-handler";
 
 interface AuthContextType {
   admin: Administrador | null;
@@ -50,11 +51,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       router.push("/dashboard");
     } catch (error) {
+      const { title, description } = getAuthErrorMessage(error, "login");
       toast({
         variant: "destructive",
-        title: "Error de autenticación",
-        description:
-          error instanceof Error ? error.message : "Credenciales incorrectas",
+        title,
+        description,
       });
       throw error;
     }
@@ -76,11 +77,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       router.push("/dashboard");
     } catch (error) {
+      const { title, description } = getAuthErrorMessage(error, "register");
       toast({
         variant: "destructive",
-        title: "Error en el registro",
-        description:
-          error instanceof Error ? error.message : "No se pudo completar el registro",
+        title,
+        description,
       });
       throw error;
     }

@@ -37,6 +37,7 @@ import {
 } from "@/lib/filtros";
 import type { Inquilino, Inmueble, EstadoInquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
+import { errorHandlers } from "@/lib/error-handler";
 
 export default function InquilinosPage() {
   const { admin } = useAuth();
@@ -83,10 +84,11 @@ export default function InquilinosPage() {
       setInquilinos(inquilinosDelAdministrador);
       setInmuebles(inmueblesDelAdministrador);
     } catch (error) {
+      const { title, description } = errorHandlers.fetch(error, "los inquilinos y los inmuebles");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudieron cargar los datos",
+        title,
+        description,
       });
     } finally {
       setIsLoading(false);
@@ -152,10 +154,13 @@ export default function InquilinosPage() {
       resetForm();
       fetchData();
     } catch (error) {
+      const { title, description } = editingInquilino
+        ? errorHandlers.update(error, "el inquilino")
+        : errorHandlers.create(error, "el inquilino");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudo guardar el inquilino",
+        title,
+        description,
       });
     }
   };
@@ -203,10 +208,11 @@ export default function InquilinosPage() {
       });
       fetchData();
     } catch (error) {
+      const { title, description } = errorHandlers.update(error, "el inquilino");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudo retirar el inquilino",
+        title,
+        description,
       });
     }
   };

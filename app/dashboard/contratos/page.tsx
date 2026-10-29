@@ -38,6 +38,7 @@ import {
 import { filtrarInquilinosActivosDelAdministrador } from "@/lib/filtros";
 import type { Contrato, Inquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
+import { errorHandlers } from "@/lib/error-handler";
 
 export default function ContratosPage() {
   const { admin } = useAuth();
@@ -78,10 +79,11 @@ export default function ContratosPage() {
         filtrarInquilinosActivosDelAdministrador(inquilinosData, admin.id)
       );
     } catch (error) {
+      const { title, description } = errorHandlers.fetch(error, "los contratos y los inquilinos");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudieron cargar los datos",
+        title,
+        description,
       });
     } finally {
       setIsLoading(false);
@@ -127,10 +129,11 @@ export default function ContratosPage() {
       resetForm();
       await fetchData();
     } catch (error) {
+      const { title, description } = errorHandlers.create(error, "el contrato");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudo crear el contrato",
+        title,
+        description,
       });
     }
   };
@@ -225,10 +228,11 @@ export default function ContratosPage() {
       setContratoPdf(contrato);
       setPdfOpen(true);
     } catch (error) {
+      const { title, description } = errorHandlers.fetch(error, "el PDF del contrato");
       toast({
         variant: "destructive",
-        title: "No se pudo generar el PDF",
-        description: error instanceof Error ? error.message : "Intenta nuevamente",
+        title,
+        description,
       });
     } finally {
       setIsGeneratingPdf(null);

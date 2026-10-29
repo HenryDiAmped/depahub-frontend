@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { errorHandlers, getErrorMessage } from "./error-handler";
+import { errorHandlers, getAuthErrorMessage, getErrorMessage } from "./error-handler";
 
 describe("getErrorMessage — integridad referencial", () => {
   it("con foreign key y entityType propiedad explica inmuebles asociados", () => {
@@ -112,11 +112,11 @@ describe("getErrorMessage — códigos HTTP y red", () => {
   });
 });
 
-describe("getErrorMessage — mensaje del backend", () => {
-  it("muestra tal cual un mensaje descriptivo como Token inválido o expirado", () => {
+describe("getErrorMessage — mensajes seguros", () => {
+  it("no expone mensajes técnicos que devuelve el backend", () => {
     expect(getErrorMessage(new Error("Token inválido o expirado"), "fetch")).toEqual({
       title: "Error al cargar",
-      description: "Token inválido o expirado",
+      description: "No se pudo cargar los datos",
     });
   });
 
@@ -127,10 +127,21 @@ describe("getErrorMessage — mensaje del backend", () => {
     });
   });
 
-  it("si el valor no es Error, usa Error desconocido como descripción", () => {
+  it("si el valor no es Error, usa un mensaje de contexto", () => {
     expect(getErrorMessage(null, "update")).toEqual({
       title: "Error al actualizar",
-      description: "Error desconocido",
+      description: "No se pudo actualizar el registro",
+    });
+  });
+
+  it("convierte validaciones y credenciales en indicaciones claras", () => {
+    expect(getErrorMessage(new Error("La fecha de vencimiento no puede ser anterior a la fecha de emisión"))).toEqual({
+      title: "Revisa la información",
+      description: "La fecha de vencimiento debe ser igual o posterior a la fecha de emisión.",
+    });
+    expect(getAuthErrorMessage(new Error("401 Unauthorized"), "login")).toEqual({
+      title: "No pudimos iniciar sesión",
+      description: "El correo o la contraseña no son correctos.",
     });
   });
 });

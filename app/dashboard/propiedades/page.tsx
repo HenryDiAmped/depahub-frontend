@@ -56,11 +56,12 @@ export default function PropiedadesPage() {
       try {
         const data = await propiedadesApi.getAll(admin.id);
         setPropiedades(data);
-      } catch {
+      } catch (error) {
+        const { title, description } = errorHandlers.fetch(error, "las propiedades");
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "No se pudieron cargar las propiedades",
+          title,
+          description,
         });
       } finally {
         setIsLoading(false);
@@ -76,11 +77,12 @@ export default function PropiedadesPage() {
     try {
       const data = await propiedadesApi.getAll(admin.id);
       setPropiedades(data);
-    } catch {
+    } catch (error) {
+      const { title, description } = errorHandlers.fetch(error, "las propiedades");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudieron cargar las propiedades",
+        title,
+        description,
       });
     }
   };
@@ -115,11 +117,14 @@ export default function PropiedadesPage() {
       setOpen(false);
       resetForm();
       fetchPropiedades();
-    } catch {
+    } catch (error) {
+      const { title, description } = editingPropiedad
+        ? errorHandlers.update(error, "la propiedad")
+        : errorHandlers.create(error, "la propiedad");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudo guardar la propiedad",
+        title,
+        description,
       });
     }
   };

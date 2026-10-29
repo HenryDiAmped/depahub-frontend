@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Building2 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -36,7 +37,11 @@ export default function RegisterPage() {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Las contraseñas no coinciden");
+      toast({
+        variant: "destructive",
+        title: "Las contraseñas no coinciden",
+        description: "Escribe la misma contraseña en ambos campos.",
+      });
       return;
     }
 
@@ -53,8 +58,8 @@ export default function RegisterPage() {
         fechaRegistro: today,
         utilidadTotal: 0,
       });
-    } catch (error) {
-      console.error("Error en registro:", error);
+    } catch {
+      // AuthProvider ya informa un mensaje claro mediante una notificación.
     } finally {
       setIsLoading(false);
     }

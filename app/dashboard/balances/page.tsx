@@ -9,6 +9,7 @@ import { BarChart3, Calendar, TrendingDown, TrendingUp } from "lucide-react";
 import { balancesApi, egresosApi, ingresosApi } from "@/lib/api";
 import type { BalanceMensual, Egreso, Ingreso } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
+import { errorHandlers } from "@/lib/error-handler";
 
 const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
@@ -27,8 +28,9 @@ export default function BalancesPage() {
       const [ingresosData, egresosData] = await Promise.all([ingresosApi.getAll(balance.id), egresosApi.getAll(balance.id)]);
       setIngresos(ingresosData);
       setEgresos(egresosData);
-    } catch {
-      toast({ variant: "destructive", title: "Error", description: "No se pudo cargar el detalle del balance" });
+    } catch (error) {
+      const { title, description } = errorHandlers.fetch(error, "el detalle del balance");
+      toast({ variant: "destructive", title, description });
     }
   };
 
@@ -39,8 +41,9 @@ export default function BalancesPage() {
         const data = await balancesApi.getAll(admin.id);
         setBalances(data);
         if (data.length) await seleccionarBalance(data[0]);
-      } catch {
-        toast({ variant: "destructive", title: "Error", description: "No se pudieron cargar los balances" });
+      } catch (error) {
+        const { title, description } = errorHandlers.fetch(error, "los balances");
+        toast({ variant: "destructive", title, description });
       } finally {
         setIsLoading(false);
       }

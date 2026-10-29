@@ -7,6 +7,22 @@ export interface ErrorDetails {
   description: string;
 }
 
+const mensajesDeValidacion: Array<[RegExp, string]> = [
+  [/fecha de vencimiento.*anterior/i, "La fecha de vencimiento debe ser igual o posterior a la fecha de emisión."],
+  [/fechas de inicio y fin.*obligatorias/i, "Indica la fecha de inicio y la fecha de fin del contrato."],
+  [/fecha de fin.*anterior/i, "La fecha de fin debe ser posterior a la fecha de inicio."],
+  [/duración mínima de un mes/i, "El contrato debe tener una duración mínima de un mes."],
+  [/frecuencia.*mayor que cero/i, "Selecciona una frecuencia de pago válida."],
+  [/frecuencia de pago.*compatible/i, "La frecuencia de pago no es compatible con las fechas elegidas."],
+  [/dni/i, "El DNI ya está registrado. Verifica el número ingresado."],
+  [/email|correo/i, "El correo electrónico ya está registrado. Usa otro correo."],
+  [/teléfono|telefono/i, "El número de teléfono ya está registrado. Verifica el dato ingresado."],
+];
+
+function mensajeAmigableDeValidacion(errorMessage: string) {
+  return mensajesDeValidacion.find(([patron]) => patron.test(errorMessage))?.[1];
+}
+
 /**
  * Analiza un error y retorna un mensaje amigable para el usuario
  */
@@ -17,6 +33,14 @@ export function getErrorMessage(
   entityType?: string // Nuevo parámetro para identificar el tipo de entidad
 ): ErrorDetails {
   const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+  const mensajeValidacion = mensajeAmigableDeValidacion(errorMessage);
+
+  if (mensajeValidacion) {
+    return {
+      title: "Revisa la información",
+      description: mensajeValidacion,
+    };
+  }
   
   // Errores de integridad referencial (restricciones de FK)
   if (errorMessage.toLowerCase().includes("constraint") || 
@@ -116,37 +140,46 @@ export function getErrorMessage(
   }
   
   // Mensaje por contexto
+  const nombreParaMensaje = entityName === "registro"
+    ? (context === "fetch" ? "los datos" : "el registro")
+    : entityName.toLowerCase();
   const contextMessages: Record<typeof context, ErrorDetails> = {
     delete: {
       title: "Error al eliminar",
-      description: `No se pudo eliminar ${entityName.toLowerCase()}`,
+      description: `No se pudo eliminar ${nombreParaMensaje}`,
     },
     create: {
       title: "Error al crear",
-      description: `No se pudo crear ${entityName.toLowerCase()}`,
+      description: `No se pudo crear ${nombreParaMensaje}`,
     },
     update: {
       title: "Error al actualizar",
-      description: `No se pudo actualizar ${entityName.toLowerCase()}`,
+      description: `No se pudo actualizar ${nombreParaMensaje}`,
     },
     fetch: {
       title: "Error al cargar",
-      description: `No se pudo cargar ${entityName.toLowerCase()}`,
+      description: `No se pudo cargar ${nombreParaMensaje}`,
     },
   };
   
-  // Si el mensaje del backend es descriptivo, usarlo
-  if (errorMessage && 
-      !errorMessage.startsWith("Error:") && 
-      errorMessage.length > 10 && 
-      errorMessage.length < 200) {
+  return contextMessages[context];
+}
+
+export function getAuthErrorMessage(error: unknown, action: "login" | "register"): ErrorDetails {
+  const errorMessage = error instanceof Error ? error.message : "";
+
+  if (/401|403|credenciales|invalid.*password|bad credentials/i.test(errorMessage)) {
     return {
-      title: contextMessages[context].title,
-      description: errorMessage,
+      title: "No pudimos iniciar sesión",
+      description: "El correo o la contraseña no son correctos.",
     };
   }
-  
-  return contextMessages[context];
+
+  if (action === "register") {
+    return getErrorMessage(error, "create", "la cuenta");
+  }
+
+  return getErrorMessage(error, "fetch", "la sesión");
 }
 
 /**

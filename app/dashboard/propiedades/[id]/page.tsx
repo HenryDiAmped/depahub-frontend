@@ -68,10 +68,11 @@ export default function PropiedadDetallePage() {
       setInmuebles(inmueblesData);
       setInquilinos(inquilinosData);
     } catch (error) {
+      const { title, description } = errorHandlers.fetch(error, "la propiedad y sus inmuebles");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudieron cargar los datos",
+        title,
+        description,
       });
     } finally {
       setIsLoading(false);
@@ -112,10 +113,13 @@ export default function PropiedadDetallePage() {
       resetForm();
       fetchData();
     } catch (error) {
+      const { title, description } = editingInmueble
+        ? errorHandlers.update(error, "el inmueble")
+        : errorHandlers.create(error, "el inmueble");
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudo guardar el inmueble",
+        title,
+        description,
       });
     }
   };

@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cuentasApi, inquilinosApi } from "@/lib/api";
 import type { Cuenta, Inquilino } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
+import { errorHandlers } from "@/lib/error-handler";
 
 export default function InquilinoDetallePage() {
   const params = useParams<{ id: string }>();
@@ -43,10 +44,11 @@ export default function InquilinoDetallePage() {
           cuentasData.filter((cuenta) => cuenta.estado === "PENDIENTE")
         );
       } catch (error) {
+        const { title, description } = errorHandlers.fetch(error, "los pagos del inquilino");
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "No se pudieron cargar los pagos del inquilino.",
+          title,
+          description,
         });
       } finally {
         setIsLoading(false);
