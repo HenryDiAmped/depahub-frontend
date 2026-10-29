@@ -99,6 +99,15 @@ export default function InquilinosPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!formData.inmuebleId) {
+      toast({
+        variant: "destructive",
+        title: "Selecciona un inmueble",
+        description: "Asigna un inmueble al inquilino antes de guardar.",
+      });
+      return;
+    }
+
     try {
       const inquilinoData: Inquilino = {
         nombreCompleto: formData.nombreCompleto,
@@ -365,7 +374,10 @@ export default function InquilinosPage() {
                       setFormData({ ...formData, inmuebleId: value })
                     }
                   >
-                    <SelectTrigger className="h-10 rounded-lg mt-1">
+                    <SelectTrigger
+                      aria-required="true"
+                      className="h-10 rounded-lg mt-1"
+                    >
                       <SelectValue placeholder="Seleccionar inmueble" />
                     </SelectTrigger>
                     <SelectContent>
