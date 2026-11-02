@@ -12,7 +12,7 @@ import type {
   Egreso,
 } from './types';
 
-const BASE_URL = 'http://localhost:8080/api';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL + '/api';
 
 // ============================================
 // UTILIDADES PARA FETCH
